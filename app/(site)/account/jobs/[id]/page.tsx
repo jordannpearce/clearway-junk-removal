@@ -3,8 +3,8 @@ import { cancelJobAction, updateCustomerJobAction } from "@/lib/actions";
 import { getSession } from "@/lib/auth";
 import { cities } from "@/lib/cities";
 import { getJob, jobSizes } from "@/lib/store";
+import { FormSubmit } from "@/components/form-submit";
 import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,7 +85,7 @@ export default async function CustomerJobPage({
         </div>
         {!locked ? (
           <div className="sm:col-span-2">
-            <Button type="submit">Save changes and notify the team</Button>
+            <FormSubmit>Save changes and notify the team</FormSubmit>
           </div>
         ) : (
           <p className="sm:col-span-2 text-sm text-muted-foreground">This job can no longer be edited because it is {job.status.replace("_", " ")}.</p>
@@ -95,9 +95,7 @@ export default async function CustomerJobPage({
       {!locked && job.status !== "en_route" ? (
         <form action={cancelJobAction} className="mt-6">
           <input type="hidden" name="id" value={job.id} />
-          <Button type="submit" variant="destructive">
-            Cancel this job
-          </Button>
+          <FormSubmit variant="destructive">Cancel this job</FormSubmit>
         </form>
       ) : null}
     </div>

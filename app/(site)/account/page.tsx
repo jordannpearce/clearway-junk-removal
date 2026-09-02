@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
+import { FormSubmit } from "@/components/form-submit";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/lib/actions";
 import { getSession } from "@/lib/auth";
@@ -43,9 +44,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
             </Button>
           )}
           <form action={logoutAction}>
-            <Button type="submit" variant="ghost">
-              Sign out
-            </Button>
+            <FormSubmit variant="ghost">Sign out</FormSubmit>
           </form>
         </div>
       </div>

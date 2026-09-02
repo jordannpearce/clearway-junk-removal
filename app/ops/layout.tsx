@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Truck } from "lucide-react";
 import { logoutAction } from "@/lib/actions";
 import { getSession } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +43,9 @@ export default async function OpsLayout({ children }: { children: React.ReactNod
           </Link>
         </nav>
         <form action={logoutAction} className="p-4">
-          <Button type="submit" variant="secondary" className="w-full">
+          <FormSubmit variant="secondary" className="w-full">
             Sign out
-          </Button>
+          </FormSubmit>
         </form>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">

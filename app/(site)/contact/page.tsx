@@ -1,7 +1,7 @@
 import { contactAction } from "@/lib/actions";
 import { pageMeta } from "@/lib/seo";
 import { site } from "@/lib/site";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,7 +60,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/contact"
           <Label htmlFor="message">How can we help?</Label>
           <Textarea id="message" name="message" required className="mt-1.5 min-h-32" placeholder="Tell us the city, the pile, and whether you need a same-day window." />
         </div>
-        <Button type="submit">Send to Hayward dispatch</Button>
+        <FormSubmit>Send to Hayward dispatch</FormSubmit>
       </form>
     </div>
   );

@@ -1,7 +1,7 @@
 import { loginAction, registerAction } from "@/lib/actions";
 import { demoAccounts } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,13 +32,13 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           <form action={loginAction} className="mt-4 space-y-4 rounded-3xl border border-border bg-card p-6">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required className="mt-1.5" />
+              <Input id="email" name="email" type="email" autoComplete="username" required className="mt-1.5" />
             </div>
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required className="mt-1.5" />
+              <Input id="password" name="password" type="password" autoComplete="current-password" required className="mt-1.5" />
             </div>
-            <Button type="submit">Sign in</Button>
+            <FormSubmit>Sign in</FormSubmit>
           </form>
         </TabsContent>
         <TabsContent value="register">
@@ -59,7 +59,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
               <Label htmlFor="reg-password">Password</Label>
               <Input id="reg-password" name="password" type="password" required className="mt-1.5" />
             </div>
-            <Button type="submit">Create account</Button>
+            <FormSubmit>Create account</FormSubmit>
           </form>
         </TabsContent>
       </Tabs>

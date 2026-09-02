@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { saveLocationAction } from "@/lib/actions";
@@ -28,9 +28,7 @@ export function LocationForm({ location }: { location?: SavedLocation | null }) 
         <Input id="zip" name="zip" defaultValue={location?.zip || "94541"} className="mt-1.5" />
       </div>
       <div className="flex items-end">
-        <Button type="submit" className="w-full">
-          Save location and find a tech
-        </Button>
+        <FormSubmit className="w-full">Save location and find a tech</FormSubmit>
       </div>
     </form>
   );

@@ -4,7 +4,7 @@ import { getSavedLocation } from "@/lib/location-cookie";
 import { pageMeta } from "@/lib/seo";
 import { services } from "@/lib/services";
 import { jobSizes } from "@/lib/store";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,7 +101,7 @@ export default async function SchedulePage({
           <Textarea id="notes" name="notes" className="mt-1.5 min-h-28" placeholder="Garage stall, keep the bikes, take the sofa and boxes..." />
         </div>
         <div className="sm:col-span-2">
-          <Button type="submit">Request this appointment</Button>
+          <FormSubmit>Request this appointment</FormSubmit>
         </div>
       </form>
     </div>

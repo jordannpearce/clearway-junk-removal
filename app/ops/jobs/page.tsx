@@ -4,7 +4,7 @@ import { cities } from "@/lib/cities";
 import { services } from "@/lib/services";
 import { jobSizes, listJobs, listTechnicians } from "@/lib/store";
 import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -86,7 +86,7 @@ export default function OpsJobsPage() {
           <Textarea id="notes" name="notes" className="mt-1.5" />
         </div>
         <div>
-          <Button type="submit">Create and dispatch</Button>
+          <FormSubmit>Create and dispatch</FormSubmit>
         </div>
       </form>
       <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">

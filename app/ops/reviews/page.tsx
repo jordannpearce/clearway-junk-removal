@@ -1,7 +1,7 @@
 import { sendReviewRequestAction } from "@/lib/actions";
 import { recommendedSmsProviders } from "@/lib/notify";
 import { listJobs, listNotifications } from "@/lib/store";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Label } from "@/components/ui/label";
 
 export default async function ReviewsPage({ searchParams }: PageProps<"/ops/reviews">) {
@@ -40,7 +40,7 @@ export default async function ReviewsPage({ searchParams }: PageProps<"/ops/revi
                   <option value="sms">SMS</option>
                 </select>
               </div>
-              <Button type="submit">Send request</Button>
+              <FormSubmit>Send request</FormSubmit>
             </form>
           ))
         )}

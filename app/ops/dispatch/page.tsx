@@ -1,7 +1,7 @@
 import { dispatchJobAction } from "@/lib/actions";
 import { jobStatuses, listJobs, listTechnicians, statusLabel } from "@/lib/store";
 import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
+import { FormSubmit } from "@/components/form-submit";
 import { Label } from "@/components/ui/label";
 
 export default function DispatchPage() {
@@ -63,7 +63,7 @@ export default function DispatchPage() {
                   ))}
                 </select>
               </div>
-              <Button type="submit">Update and notify</Button>
+              <FormSubmit>Update and notify</FormSubmit>
             </div>
           </form>
         ))}
