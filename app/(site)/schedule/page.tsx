@@ -46,8 +46,11 @@ export default async function SchedulePage({
           service: defaultService,
           city: defaultCity,
           zip: location?.zip || "94541",
-          name: session?.name || "",
-          email: session?.email || "",
+          name: typeof query.name === "string" ? query.name : session?.name || "",
+          email: typeof query.email === "string" ? query.email : session?.email || "",
+          phone: typeof query.phone === "string" ? query.phone : "",
+          address: typeof query.address === "string" ? query.address : "",
+          notes: typeof query.notes === "string" ? query.notes : "",
         }}
       />
     </div>
