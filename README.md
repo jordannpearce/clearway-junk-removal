@@ -37,14 +37,14 @@ Jobs are stored in `data/runtime-store.json` on this machine when no database is
 
 ## GitHub and Railway Postgres
 
+- GitHub: [jordannpearce/clearway-junk-removal](https://github.com/jordannpearce/clearway-junk-removal)
+- Live site: [https://web-production-25c9b.up.railway.app](https://web-production-25c9b.up.railway.app)
+
 Users and customers persist in PostgreSQL when `DATABASE_URL` is set (Railway injects this from the Postgres plugin). Without it, the app still runs on the local file store.
 
-1. Authorize GitHub, create the repository, and push this project.
-2. In [Railway](https://railway.app), create a project from that GitHub repo.
-3. Add a Postgres plugin. Railway sets `DATABASE_URL`.
-4. Redeploy. The app creates the `users` and `customers` tables on first request and seeds the demo accounts.
+The Railway project `clearway-junk-removal` deploys the `web` service from the `main` branch of that GitHub repo and attaches a Postgres plugin. `DATABASE_URL` on `web` is `${{Postgres.DATABASE_URL}}`. The first request that needs accounts creates the `users` and `customers` tables and seeds the demo logins.
 
-`railway.toml` and `Dockerfile` are included for that deploy.
+`railway.toml` and `Dockerfile` are included for that deploy. Set `SITE_URL` on the web service so sitemap and canonical URLs use the public Railway domain.
 
 ## Email and SMS
 

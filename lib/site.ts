@@ -18,6 +18,15 @@ export const site = {
     "Clearway Junk Removal is a Hayward, California junk hauling and debris removal company that helps homeowners, landlords, and job sites across Alameda County and Contra Costa County clear space with same-day crews, careful handling, and responsible recycling.",
 } as const;
 
+export function publicSiteUrl() {
+  const fromEnv = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL;
+  if (fromEnv) return fromEnv.replace(/\/$/, "");
+  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+    return `https://${process.env.RAILWAY_PUBLIC_DOMAIN.replace(/\/$/, "")}`;
+  }
+  return "http://127.0.0.1:43123";
+}
+
 export const demoAccounts = {
   customer: { email: "customer@clearwayjunk.com", password: "customer123", name: "Jordan Hale" },
   ops: { email: "ops@clearwayjunk.com", password: "ops123", name: "Maya Chen" },

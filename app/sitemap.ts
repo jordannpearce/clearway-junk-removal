@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { cities } from "@/lib/cities";
 import { guides } from "@/lib/guides";
+import { publicSiteUrl } from "@/lib/site";
 import { services } from "@/lib/services";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "http://127.0.0.1:43123";
+  const base = publicSiteUrl();
   const staticRoutes = [
     "",
     "/services",

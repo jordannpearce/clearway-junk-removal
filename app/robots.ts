@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { publicSiteUrl } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/ops", "/account", "/login"],
     },
-    sitemap: "http://127.0.0.1:43123/sitemap.xml",
+    sitemap: `${publicSiteUrl()}/sitemap.xml`,
   };
 }

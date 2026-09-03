@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Newsreader, Outfit } from "next/font/google";
-import { site } from "@/lib/site";
+import { publicSiteUrl, site } from "@/lib/site";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -14,7 +14,7 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("http://127.0.0.1:43123"),
+  metadataBase: new URL(publicSiteUrl()),
   title: {
     default: `${site.name} | Junk Hauling in Hayward, California`,
     template: `%s | ${site.name}`,
