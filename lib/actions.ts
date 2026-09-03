@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cities, findCityByName } from "@/lib/cities";
+import { upsertCustomer } from "@/lib/accounts";
 import { clearSession, getSession, loginWithPassword, registerCustomer, setSession } from "@/lib/auth";
 import { setSavedLocation } from "@/lib/location-cookie";
 import { suggestTechnician } from "@/lib/location";
@@ -35,7 +36,7 @@ export async function saveLocationAction(formData: FormData) {
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
-  const session = loginWithPassword(email, password);
+  const session = await loginWithPassword(email, password);
   if (!session) {
     redirect("/login?error=We%20could%20not%20match%20that%20email%20and%20password.");
   }
@@ -45,7 +46,7 @@ export async function loginAction(formData: FormData) {
 
 export async function registerAction(formData: FormData) {
   try {
-    const session = registerCustomer({
+    const session = await registerCustomer({
       name: String(formData.get("name") || ""),
       email: String(formData.get("email") || ""),
       phone: String(formData.get("phone") || ""),
@@ -114,6 +115,15 @@ export async function scheduleJobAction(formData: FormData) {
     audience.push({ channel: "sms", to: customerPhone, name: customerName });
   }
   await notifyJobChange(job, audience.filter((item) => item.to));
+  await upsertCustomer({
+    userId: session?.userId,
+    name: customerName,
+    email: customerEmail,
+    phone: customerPhone,
+    city: location.city,
+    zip: location.zip,
+    notes: job.notes,
+  });
 
   revalidatePath("/account");
   revalidatePath("/ops");

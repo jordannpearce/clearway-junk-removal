@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: false,
   },
+  serverExternalPackages: ["pg"],
 };
 
 export default nextConfig;

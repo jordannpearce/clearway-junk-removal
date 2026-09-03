@@ -33,7 +33,18 @@ Open [http://127.0.0.1:43123](http://127.0.0.1:43123).
 | Dispatch | ops@clearwayjunk.com | ops123 |
 | Technician | tech@clearwayjunk.com | tech123 |
 
-Jobs are stored in `data/runtime-store.json` on this machine. That file is created on first use and is gitignored.
+Jobs are stored in `data/runtime-store.json` on this machine when no database is configured. That file is created on first use and is gitignored.
+
+## GitHub and Railway Postgres
+
+Users and customers persist in PostgreSQL when `DATABASE_URL` is set (Railway injects this from the Postgres plugin). Without it, the app still runs on the local file store.
+
+1. Authorize GitHub, create the repository, and push this project.
+2. In [Railway](https://railway.app), create a project from that GitHub repo.
+3. Add a Postgres plugin. Railway sets `DATABASE_URL`.
+4. Redeploy. The app creates the `users` and `customers` tables on first request and seeds the demo accounts.
+
+`railway.toml` and `Dockerfile` are included for that deploy.
 
 ## Email and SMS
 

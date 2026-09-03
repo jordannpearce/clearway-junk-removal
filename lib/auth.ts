@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { createUser, getUserByEmail, getUserById } from "@/lib/store";
+import { createAccount, findUserByEmail, findUserById } from "@/lib/accounts";
 import type { Session, UserRole } from "@/lib/types";
 
 const cookieName = "clearway_session";
@@ -10,7 +10,7 @@ export async function getSession(): Promise<Session | null> {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw) as Session;
-    const user = getUserById(parsed.userId);
+    const user = await findUserById(parsed.userId);
     if (!user) return null;
     return {
       userId: user.id,
@@ -38,8 +38,8 @@ export async function clearSession() {
   jar.delete(cookieName);
 }
 
-export function loginWithPassword(email: string, password: string) {
-  const user = getUserByEmail(email);
+export async function loginWithPassword(email: string, password: string) {
+  const user = await findUserByEmail(email);
   if (!user || user.password !== password) return null;
   return {
     userId: user.id,
@@ -49,7 +49,7 @@ export function loginWithPassword(email: string, password: string) {
   } satisfies Session;
 }
 
-export function registerCustomer(input: {
+export async function registerCustomer(input: {
   name: string;
   email: string;
   phone: string;
@@ -57,10 +57,10 @@ export function registerCustomer(input: {
   city?: string;
   zip?: string;
 }) {
-  if (getUserByEmail(input.email)) {
+  if (await findUserByEmail(input.email)) {
     throw new Error("An account with that email already exists.");
   }
-  const user = createUser({
+  const user = await createAccount({
     name: input.name,
     email: input.email,
     phone: input.phone,
