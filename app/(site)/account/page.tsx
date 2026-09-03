@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/status-badge";
 import { FormSubmit } from "@/components/form-submit";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { logoutAction } from "@/lib/actions";
 import { getSession } from "@/lib/auth";
 import { listJobsForCustomer, listJobsForTechnician, listTechnicians } from "@/lib/store";
@@ -35,13 +35,11 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
         </div>
         <div className="flex gap-2">
           {session.role === "customer" ? (
-            <Button asChild>
-              <Link href="/schedule">Schedule another haul</Link>
-            </Button>
+            <LinkButton href="/schedule">Schedule another haul</LinkButton>
           ) : (
-            <Button asChild variant="outline">
-              <Link href="/ops">Open ops board</Link>
-            </Button>
+            <LinkButton href="/ops" variant="outline">
+              Open ops board
+            </LinkButton>
           )}
           <form action={logoutAction}>
             <FormSubmit variant="ghost">Sign out</FormSubmit>

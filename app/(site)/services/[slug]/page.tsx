@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FaqList } from "@/components/faq-list";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { pageMeta } from "@/lib/seo";
 import { getService, services } from "@/lib/services";
 
@@ -40,12 +40,12 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{service.intro}</p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href={`/schedule?service=${service.slug}`}>Schedule {service.shortName.toLowerCase()}</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link href="/location">Match a nearby technician</Link>
-          </Button>
+          <LinkButton href={`/schedule?service=${service.slug}`}>
+            Schedule {service.shortName.toLowerCase()}
+          </LinkButton>
+          <LinkButton href="/location" variant="outline">
+            Match a nearby technician
+          </LinkButton>
         </div>
 
         <section className="mt-12 grid gap-8 lg:grid-cols-2">

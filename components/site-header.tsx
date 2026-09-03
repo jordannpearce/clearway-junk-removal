@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MapPin, Phone, Truck } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { getSession } from "@/lib/auth";
 import { getSavedLocation } from "@/lib/location-cookie";
 import { site } from "@/lib/site";
@@ -51,26 +51,22 @@ export async function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
-            <Link href="/location">
-              <MapPin className="size-3.5" />
-              {location?.city || "Set location"}
-            </Link>
-          </Button>
+          <LinkButton href="/location" variant="ghost" size="sm" className="hidden md:inline-flex">
+            <MapPin className="size-3.5" />
+            {location?.city || "Set location"}
+          </LinkButton>
           {session ? (
-            <Button asChild size="sm">
-              <Link href={session.role === "customer" ? "/account" : "/ops"}>
-                {session.role === "customer" ? "My jobs" : "Dispatch"}
-              </Link>
-            </Button>
+            <LinkButton href={session.role === "customer" ? "/account" : "/ops"} size="sm">
+              {session.role === "customer" ? "My jobs" : "Dispatch"}
+            </LinkButton>
           ) : (
-            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-              <Link href="/login">Sign in</Link>
-            </Button>
+            <LinkButton href="/login" variant="outline" size="sm" className="hidden sm:inline-flex">
+              Sign in
+            </LinkButton>
           )}
-          <Button asChild size="sm">
-            <Link href="/schedule">Schedule</Link>
-          </Button>
+          <LinkButton href="/schedule" size="sm">
+            Schedule
+          </LinkButton>
           <MobileNav signedIn={Boolean(session)} role={session?.role} city={location?.city} />
         </div>
       </div>

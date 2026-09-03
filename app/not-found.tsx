@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 
 export default function NotFound() {
   return (
@@ -9,12 +8,10 @@ export default function NotFound() {
         The Hayward yard is still here. Try the homepage, the city list, or schedule a haul.
       </p>
       <div className="mt-6 flex gap-3">
-        <Button asChild>
-          <Link href="/">Home</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/schedule">Schedule</Link>
-        </Button>
+        <LinkButton href="/">Home</LinkButton>
+        <LinkButton href="/schedule" variant="outline">
+          Schedule
+        </LinkButton>
       </div>
     </div>
   );

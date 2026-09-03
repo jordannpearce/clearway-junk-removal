@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { MapPin, UserRound } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { closestTechnicians, locationLabel } from "@/lib/location";
 import type { SavedLocation } from "@/lib/types";
@@ -36,9 +35,9 @@ export function NearestTech({ location }: { location: SavedLocation | null }) {
                 ))}
               </div>
             </div>
-            <Button asChild size="sm">
-              <Link href={`/schedule?city=${encodeURIComponent(tech.homeCity)}`}>Book {tech.name.split(" ")[0]}</Link>
-            </Button>
+            <LinkButton href={`/schedule?city=${encodeURIComponent(tech.homeCity)}`} size="sm">
+              Book {tech.name.split(" ")[0]}
+            </LinkButton>
           </div>
         ))}
         <p className="text-sm text-muted-foreground">

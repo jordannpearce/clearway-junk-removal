@@ -104,9 +104,9 @@ export async function scheduleJobAction(formData: FormData) {
     status: nearest ? "confirmed" : "requested",
   });
 
-  const audience = [
-    { channel: "email" as const, to: customerEmail, name: customerName },
-    { channel: "email" as const, to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
+  const audience: { channel: NotifyChannel; to: string; name: string }[] = [
+    { channel: "email", to: customerEmail, name: customerName },
+    { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
   ];
   if (nearest) {
     audience.push({ channel: "email", to: nearest.tech.email, name: nearest.tech.name });
@@ -170,19 +170,18 @@ export async function cancelJobAction(formData: FormData) {
   if (session.role === "customer" && job.customerId !== session.userId) redirect("/account");
   const next = updateJob(id, { status: "cancelled" });
   if (next) {
-    await notifyJobChange(next, [
+    const audience: { channel: NotifyChannel; to: string; name: string }[] = [
       { channel: "email", to: next.customerEmail, name: next.customerName },
       { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
-      ...(next.technicianId
-        ? [
-            {
-              channel: "email" as const,
-              to: getTechnician(next.technicianId)?.email || "",
-              name: next.technicianName || "Technician",
-            },
-          ]
-        : []),
-    ].filter((item) => item.to));
+    ];
+    if (next.technicianId) {
+      audience.push({
+        channel: "email",
+        to: getTechnician(next.technicianId)?.email || "",
+        name: next.technicianName || "Technician",
+      });
+    }
+    await notifyJobChange(next, audience.filter((item) => item.to));
   }
   revalidatePath("/account");
   revalidatePath("/ops");
@@ -204,9 +203,9 @@ export async function dispatchJobAction(formData: FormData) {
     status,
   });
   if (job) {
-    const audience = [
-      { channel: "email" as const, to: job.customerEmail, name: job.customerName },
-      { channel: "email" as const, to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
+    const audience: { channel: NotifyChannel; to: string; name: string }[] = [
+      { channel: "email", to: job.customerEmail, name: job.customerName },
+      { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
     ];
     if (tech) audience.push({ channel: "email", to: tech.email, name: tech.name });
     if (job.customerPhone) audience.push({ channel: "sms", to: job.customerPhone, name: job.customerName });

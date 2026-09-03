@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { getJob } from "@/lib/store";
 import { pageMeta } from "@/lib/seo";
 
@@ -21,12 +20,10 @@ export default async function ThanksPage({ searchParams }: PageProps<"/schedule/
         {" "}Create an account with the same email if you want to edit, cancel, or watch status.
       </p>
       <div className="mt-6 flex gap-3">
-        <Button asChild>
-          <Link href="/login">Create or open an account</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/">Back home</Link>
-        </Button>
+        <LinkButton href="/login">Create or open an account</LinkButton>
+        <LinkButton href="/" variant="outline">
+          Back home
+        </LinkButton>
       </div>
     </div>
   );

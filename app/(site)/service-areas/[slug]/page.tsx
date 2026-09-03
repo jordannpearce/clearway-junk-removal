@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FaqList } from "@/components/faq-list";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { cities, getCity } from "@/lib/cities";
 import { cityCopy } from "@/lib/city-copy";
 import { pageMeta } from "@/lib/seo";
@@ -34,12 +34,12 @@ export default async function CityPage({ params }: PageProps<"/service-areas/[sl
       <h1 className="mt-2 max-w-4xl font-heading text-4xl sm:text-5xl">{copy.headline}</h1>
       <p className="mt-5 max-w-3xl text-lg leading-relaxed text-muted-foreground">{copy.lede}</p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <Button asChild>
-          <Link href={`/schedule?city=${encodeURIComponent(city.name)}`}>Schedule in {city.name}</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href={`/location`}>Set {city.name} as my location</Link>
-        </Button>
+        <LinkButton href={`/schedule?city=${encodeURIComponent(city.name)}`}>
+          Schedule in {city.name}
+        </LinkButton>
+        <LinkButton href="/location" variant="outline">
+          Set {city.name} as my location
+        </LinkButton>
       </div>
 
       <section className="mt-12 grid gap-8 lg:grid-cols-2">

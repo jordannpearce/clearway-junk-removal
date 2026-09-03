@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Clock3, HeartHandshake, Recycle, Shield } fro
 import { FaqList } from "@/components/faq-list";
 import { LocationForm } from "@/components/location-form";
 import { NearestTech } from "@/components/nearest-tech";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/link-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cities, citiesByCounty } from "@/lib/cities";
 import { homeFaqs } from "@/lib/faqs";
@@ -48,15 +48,13 @@ export default async function HomePage() {
             Clearway Junk Removal is the local crew neighbors call when a garage, remodel, or whole house needs a careful reset. We haul household junk, construction debris, furniture, appliances, yard waste, and e-waste across Alameda County and Contra Costa County, then recycle or donate what we can.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link href="/schedule">
-                Schedule a haul
-                <ArrowRight />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/location">Find the closest technician</Link>
-            </Button>
+            <LinkButton href="/schedule" size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+              Schedule a haul
+              <ArrowRight />
+            </LinkButton>
+            <LinkButton href="/location" size="lg" variant="secondary">
+              Find the closest technician
+            </LinkButton>
           </div>
         </div>
       </section>
@@ -116,9 +114,9 @@ export default async function HomePage() {
                 Each service page is written in full sentences so a person, or a search model, can understand the job without guessing. Choose the pile that matches your day.
               </p>
             </div>
-            <Button asChild variant="outline" className="hidden sm:inline-flex">
-              <Link href="/services">All services</Link>
-            </Button>
+            <LinkButton href="/services" variant="outline" className="hidden sm:inline-flex">
+              All services
+            </LinkButton>
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {services.map((service) => (
@@ -245,9 +243,9 @@ export default async function HomePage() {
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="flex items-end justify-between">
           <h2 className="font-heading text-3xl sm:text-4xl">Guides written for real East Bay decisions</h2>
-          <Button asChild variant="ghost">
-            <Link href="/guides">All guides</Link>
-          </Button>
+          <LinkButton href="/guides" variant="ghost">
+            All guides
+          </LinkButton>
         </div>
         <div className="mt-8 grid gap-5 md:grid-cols-2">
           {guides.slice(0, 4).map((guide) => (
@@ -279,12 +277,12 @@ export default async function HomePage() {
             Schedule a visit, set your city for the closest tech, or sign in to manage a job you already booked. If the pile is sitting in the driveway tonight, call {site.phone}. A dispatcher in Hayward will answer like a neighbor.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link href="/schedule">Book junk removal</Link>
-            </Button>
-            <Button asChild size="lg" variant="secondary">
-              <Link href="/contact">Talk to dispatch</Link>
-            </Button>
+            <LinkButton href="/schedule" size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
+              Book junk removal
+            </LinkButton>
+            <LinkButton href="/contact" size="lg" variant="secondary">
+              Talk to dispatch
+            </LinkButton>
           </div>
         </div>
       </section>
