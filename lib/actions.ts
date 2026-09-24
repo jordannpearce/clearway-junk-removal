@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cities, findCityByName } from "@/lib/cities";
-import { upsertCustomer } from "@/lib/accounts";
+import { listDispatchNotifyTargets, upsertCustomer } from "@/lib/accounts";
 import { clearSession, getSession, loginWithPassword, registerCustomer, setSession } from "@/lib/auth";
 import { setSavedLocation } from "@/lib/location-cookie";
 import { suggestTechnician } from "@/lib/location";
@@ -12,9 +12,9 @@ import { getService } from "@/lib/services";
 import {
   createJob,
   getJob,
-  getTechnician,
   updateJob,
 } from "@/lib/store";
+import { getTechnician } from "@/lib/technicians";
 import { site, staffHome } from "@/lib/site";
 import type { JobSize, JobStatus, NotifyChannel } from "@/lib/types";
 
@@ -81,7 +81,7 @@ export async function scheduleJobAction(formData: FormData) {
     zip: String(formData.get("zip") || city?.zip || "94541"),
     label: city ? `${city.name}, ${city.county} County` : cityName,
   };
-  const nearest = suggestTechnician(location);
+  const nearest = await suggestTechnician(location);
   const customerName = session?.name || String(formData.get("name") || "Guest customer");
   const customerEmail = session?.email || String(formData.get("email") || "");
   const customerPhone = String(formData.get("phone") || "");
@@ -105,9 +105,10 @@ export async function scheduleJobAction(formData: FormData) {
     status: nearest ? "confirmed" : "requested",
   });
 
+  const desk = await listDispatchNotifyTargets();
   const audience: { channel: NotifyChannel; to: string; name: string }[] = [
     { channel: "email", to: customerEmail, name: customerName },
-    { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
+    ...desk.map((item) => ({ channel: "email" as const, to: item.to, name: item.name })),
   ];
   if (nearest) {
     audience.push({ channel: "email", to: nearest.tech.email, name: nearest.tech.name });
@@ -151,9 +152,13 @@ export async function updateCustomerJobAction(formData: FormData) {
     size: String(formData.get("size") || job.size) as JobSize,
   });
   if (next) {
-    const audience = [{ channel: "email" as const, to: "ops@clearwayjunk.com", name: "Clearway dispatch" }];
+    const audience = (await listDispatchNotifyTargets()).map((item) => ({
+      channel: "email" as const,
+      to: item.to,
+      name: item.name,
+    }));
     if (next.technicianId) {
-      const tech = getTechnician(next.technicianId);
+      const tech = await getTechnician(next.technicianId);
       if (tech) audience.push({ channel: "email", to: tech.email, name: tech.name });
     }
     await notifyJobChange(next, audience);
@@ -173,12 +178,13 @@ export async function cancelJobAction(formData: FormData) {
   if (next) {
     const audience: { channel: NotifyChannel; to: string; name: string }[] = [
       { channel: "email", to: next.customerEmail, name: next.customerName },
-      { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
+      ...(await listDispatchNotifyTargets()).map((item) => ({ channel: "email" as const, to: item.to, name: item.name })),
     ];
     if (next.technicianId) {
+      const tech = await getTechnician(next.technicianId);
       audience.push({
         channel: "email",
-        to: getTechnician(next.technicianId)?.email || "",
+        to: tech?.email || "",
         name: next.technicianName || "Technician",
       });
     }
@@ -197,7 +203,7 @@ export async function dispatchJobAction(formData: FormData) {
   const id = String(formData.get("id") || "");
   const technicianId = String(formData.get("technicianId") || "");
   const status = String(formData.get("status") || "dispatched") as JobStatus;
-  const tech = technicianId ? getTechnician(technicianId) : undefined;
+  const tech = technicianId ? await getTechnician(technicianId) : undefined;
   const job = updateJob(id, {
     technicianId: tech?.id,
     technicianName: tech?.name,
@@ -206,7 +212,7 @@ export async function dispatchJobAction(formData: FormData) {
   if (job) {
     const audience: { channel: NotifyChannel; to: string; name: string }[] = [
       { channel: "email", to: job.customerEmail, name: job.customerName },
-      { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
+      ...(await listDispatchNotifyTargets()).map((item) => ({ channel: "email" as const, to: item.to, name: item.name })),
     ];
     if (tech) audience.push({ channel: "email", to: tech.email, name: tech.name });
     if (job.customerPhone) audience.push({ channel: "sms", to: job.customerPhone, name: job.customerName });
@@ -270,9 +276,9 @@ export async function createOpsJobAction(formData: FormData) {
     zip: String(formData.get("zip") || "94541"),
     label: cityName,
   };
-  const nearest = suggestTechnician(location);
+  const nearest = await suggestTechnician(location);
   const techId = String(formData.get("technicianId") || nearest?.tech.id || "");
-  const tech = techId ? getTechnician(techId) : nearest?.tech;
+  const tech = techId ? await getTechnician(techId) : nearest?.tech;
   createJob({
     customerId: "ops-created",
     customerName: String(formData.get("name") || ""),

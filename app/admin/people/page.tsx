@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { createPersonAction } from "@/lib/admin-actions";
 import { hasStaffAccount, listAccounts, listCustomers } from "@/lib/accounts";
 import { cities } from "@/lib/cities";
-import { listTechnicians } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,7 @@ export default async function AdminPeoplePage({ searchParams }: PageProps<"/admi
   if (!(await hasStaffAccount())) redirect("/admin/setup");
   const query = await searchParams;
   const [users, customers] = await Promise.all([listAccounts(), listCustomers()]);
-  const techs = listTechnicians();
+  const techs = await listTechnicians();
   const staff = users.filter((user) => user.role !== "customer");
 
   return (
@@ -106,7 +106,11 @@ export default async function AdminPeoplePage({ searchParams }: PageProps<"/admi
         <section>
           <h2 className="font-heading text-2xl">Technicians on the board</h2>
           <div className="mt-4 space-y-2">
-            {techs.map((tech) => (
+            {techs.length === 0 ? (
+              <p className="rounded-xl border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+                No technicians yet. Create a technician account above and they will appear on the dispatch board.
+              </p>
+            ) : techs.map((tech) => (
               <div key={tech.id} className="rounded-xl border border-border bg-card px-4 py-3 text-sm">
                 <p className="font-medium">{tech.name}</p>
                 <p className="text-muted-foreground">{tech.homeCity} · {tech.phone} · {tech.email}</p>

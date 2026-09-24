@@ -1,12 +1,13 @@
 import { dispatchJobAction } from "@/lib/actions";
-import { jobStatuses, listJobs, listTechnicians, statusLabel } from "@/lib/store";
+import { jobStatuses, listJobs, statusLabel } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { StatusBadge } from "@/components/status-badge";
 import { FormSubmit } from "@/components/form-submit";
 import { Label } from "@/components/ui/label";
 
-export default function DispatchPage() {
+export default async function DispatchPage() {
   const jobs = listJobs().filter((job) => job.status !== "cancelled");
-  const techs = listTechnicians().filter((tech) => tech.active);
+  const techs = (await listTechnicians()).filter((tech) => tech.active);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -14,6 +15,11 @@ export default function DispatchPage() {
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
         Assign the nearest technician or override for a better window. Status changes email the customer and the crew through Resend. SMS is logged through your configured phone provider.
       </p>
+      {techs.length === 0 ? (
+        <p className="mt-4 rounded-xl bg-secondary p-3 text-sm">
+          No technicians yet. Add them from Admin → People, then come back to assign jobs.
+        </p>
+      ) : null}
       <div className="mt-6 space-y-4">
         {jobs.map((job) => (
           <form key={job.id} action={dispatchJobAction} className="rounded-2xl border border-border bg-card p-5">

@@ -2,16 +2,17 @@ import Link from "next/link";
 import { createOpsJobAction } from "@/lib/actions";
 import { cities } from "@/lib/cities";
 import { services } from "@/lib/services";
-import { jobSizes, listJobs, listTechnicians } from "@/lib/store";
+import { jobSizes, listJobs } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { StatusBadge } from "@/components/status-badge";
 import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function OpsJobsPage() {
+export default async function OpsJobsPage() {
   const jobs = listJobs();
-  const techs = listTechnicians();
+  const techs = await listTechnicians();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">

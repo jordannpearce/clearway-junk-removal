@@ -4,7 +4,8 @@ import { listAccounts, listCustomers, hasStaffAccount } from "@/lib/accounts";
 import { listCalls, listNotificationLog } from "@/lib/comms";
 import { resendConfigured } from "@/lib/notify";
 import { signalwireConfig } from "@/lib/signalwire";
-import { listJobs, listTechnicians } from "@/lib/store";
+import { listJobs } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminHomePage() {
@@ -15,7 +16,7 @@ export default async function AdminHomePage() {
     listNotificationLog(6),
     listCalls(6),
   ]);
-  const techs = listTechnicians().filter((item) => item.active);
+  const techs = (await listTechnicians()).filter((item) => item.active);
   const jobs = listJobs().filter((job) => !["completed", "cancelled"].includes(job.status));
   const [resend, wire] = await Promise.all([resendConfigured(), signalwireConfig()]);
 

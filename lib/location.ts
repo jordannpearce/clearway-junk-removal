@@ -1,5 +1,5 @@
 import { cities, findCityByName, type City } from "@/lib/cities";
-import { listTechnicians } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import type { SavedLocation, Technician } from "@/lib/types";
 
 export function distanceMiles(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
@@ -19,9 +19,10 @@ export function resolveCity(location: SavedLocation | null): City | undefined {
   return findCityByName(location.city) ?? cities.find((city) => city.zip === location.zip);
 }
 
-export function closestTechnicians(location: SavedLocation | null, limit = 3) {
+export async function closestTechnicians(location: SavedLocation | null, limit = 3) {
   const city = resolveCity(location) ?? cities.find((item) => item.slug === "hayward")!;
-  return listTechnicians()
+  const techs = await listTechnicians();
+  return techs
     .filter((tech) => tech.active)
     .map((tech) => ({
       tech,
@@ -31,8 +32,8 @@ export function closestTechnicians(location: SavedLocation | null, limit = 3) {
     .slice(0, limit);
 }
 
-export function suggestTechnician(location: SavedLocation | null): { tech: Technician; miles: number } | null {
-  return closestTechnicians(location, 1)[0] ?? null;
+export async function suggestTechnician(location: SavedLocation | null): Promise<{ tech: Technician; miles: number } | null> {
+  return (await closestTechnicians(location, 1))[0] ?? null;
 }
 
 export function locationLabel(location: SavedLocation | null) {

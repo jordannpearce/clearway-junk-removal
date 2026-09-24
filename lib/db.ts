@@ -34,6 +34,24 @@ CREATE TABLE IF NOT EXISTS customers (
 CREATE INDEX IF NOT EXISTS customers_email_idx ON customers (lower(email));
 CREATE INDEX IF NOT EXISTS customers_user_id_idx ON customers (user_id);
 
+CREATE TABLE IF NOT EXISTS technicians (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL,
+  home_city TEXT NOT NULL,
+  county TEXT NOT NULL,
+  lat DOUBLE PRECISION NOT NULL,
+  lng DOUBLE PRECISION NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  specialties TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS technicians_email_idx ON technicians (lower(email));
+CREATE INDEX IF NOT EXISTS technicians_user_id_idx ON technicians (user_id);
+
 CREATE TABLE IF NOT EXISTS notifications (
   id TEXT PRIMARY KEY,
   job_id TEXT,

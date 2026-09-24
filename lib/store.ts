@@ -22,89 +22,18 @@ function now() {
   return new Date().toISOString();
 }
 
+const SEEDED_TECH_IDS = new Set([
+  "tech-andre",
+  "tech-priya",
+  "tech-luis",
+  "tech-nina",
+  "tech-jamal",
+  "tech-elena",
+]);
+
 function seed(): StoreData {
   const users: User[] = [];
-
-  const technicians: Technician[] = [
-    {
-      id: "tech-andre",
-      userId: "user-tech-andre",
-      name: "Andre Ruiz",
-      phone: "(510) 555-0177",
-      email: "tech@clearwayjunk.com",
-      homeCity: "Hayward",
-      county: "Alameda",
-      lat: 37.6688,
-      lng: -122.081,
-      active: true,
-      specialties: ["Household junk", "Estate cleanout", "Appliances"],
-    },
-    {
-      id: "tech-priya",
-      userId: "user-tech-priya",
-      name: "Priya Shah",
-      phone: "(510) 555-0144",
-      email: "priya@clearwayjunk.com",
-      homeCity: "Oakland",
-      county: "Alameda",
-      lat: 37.8044,
-      lng: -122.2712,
-      active: true,
-      specialties: ["Furniture", "Apartment hauls", "E-waste"],
-    },
-    {
-      id: "tech-luis",
-      userId: "user-tech-luis",
-      name: "Luis Ortega",
-      phone: "(510) 555-0161",
-      email: "luis@clearwayjunk.com",
-      homeCity: "Fremont",
-      county: "Alameda",
-      lat: 37.5483,
-      lng: -121.9886,
-      active: true,
-      specialties: ["Construction debris", "Yard waste", "Commercial"],
-    },
-    {
-      id: "tech-nina",
-      userId: "user-tech-nina",
-      name: "Nina Brooks",
-      phone: "(925) 555-0188",
-      email: "nina@clearwayjunk.com",
-      homeCity: "Concord",
-      county: "Contra Costa",
-      lat: 37.978,
-      lng: -122.0311,
-      active: true,
-      specialties: ["Household junk", "Garage cleanout", "Landlords"],
-    },
-    {
-      id: "tech-jamal",
-      userId: "user-tech-jamal",
-      name: "Jamal Whitaker",
-      phone: "(510) 555-0120",
-      email: "jamal@clearwayjunk.com",
-      homeCity: "Richmond",
-      county: "Contra Costa",
-      lat: 37.9358,
-      lng: -122.3477,
-      active: true,
-      specialties: ["Commercial", "Appliances", "Construction debris"],
-    },
-    {
-      id: "tech-elena",
-      userId: "user-tech-elena",
-      name: "Elena Vasquez",
-      phone: "(925) 555-0112",
-      email: "elena@clearwayjunk.com",
-      homeCity: "Walnut Creek",
-      county: "Contra Costa",
-      lat: 37.9101,
-      lng: -122.0652,
-      active: true,
-      specialties: ["Estate cleanout", "Furniture", "HOA properties"],
-    },
-  ];
+  const technicians: Technician[] = [];
 
   const jobs: Job[] = [
     {
@@ -123,8 +52,6 @@ function seed(): StoreData {
       scheduledDate: "2026-09-04",
       scheduledWindow: "10:00 a.m. – 12:00 p.m.",
       status: "confirmed",
-      technicianId: "tech-andre",
-      technicianName: "Andre Ruiz",
       createdAt: "2026-09-01T16:12:00.000Z",
       updatedAt: "2026-09-01T16:40:00.000Z",
     },
@@ -163,8 +90,6 @@ function seed(): StoreData {
       scheduledDate: "2026-08-28",
       scheduledWindow: "8:00 a.m. – 10:00 a.m.",
       status: "completed",
-      technicianId: "tech-nina",
-      technicianName: "Nina Brooks",
       createdAt: "2026-08-26T18:22:00.000Z",
       updatedAt: "2026-08-28T17:10:00.000Z",
     },
@@ -173,13 +98,29 @@ function seed(): StoreData {
   return { users, technicians, jobs, notifications: [] };
 }
 
+function stripSeededCrew(data: StoreData) {
+  const nextTechs = data.technicians.filter((tech) => !SEEDED_TECH_IDS.has(tech.id));
+  let changed = nextTechs.length !== data.technicians.length;
+  data.technicians = nextTechs;
+  for (const job of data.jobs) {
+    if (job.technicianId && SEEDED_TECH_IDS.has(job.technicianId)) {
+      delete job.technicianId;
+      delete job.technicianName;
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 function readStore(): StoreData {
   if (!existsSync(storePath)) {
     const initial = seed();
     writeStore(initial);
     return initial;
   }
-  return JSON.parse(readFileSync(storePath, "utf8")) as StoreData;
+  const data = JSON.parse(readFileSync(storePath, "utf8")) as StoreData;
+  if (stripSeededCrew(data)) writeStore(data);
+  return data;
 }
 
 function writeStore(data: StoreData) {

@@ -1,8 +1,18 @@
 import { hasDatabase, query } from "@/lib/db";
+import { site } from "@/lib/site";
 import { createUser as createFileUser, getUserByEmail as getFileUserByEmail, getUserById as getFileUserById, listUsers as listFileUsers } from "@/lib/store";
 import type { User, UserRole } from "@/lib/types";
 
-const demoEmails = ["customer@clearwayjunk.com", "ops@clearwayjunk.com", "tech@clearwayjunk.com"];
+const demoEmails = [
+  "customer@clearwayjunk.com",
+  "ops@clearwayjunk.com",
+  "tech@clearwayjunk.com",
+  "priya@clearwayjunk.com",
+  "luis@clearwayjunk.com",
+  "nina@clearwayjunk.com",
+  "jamal@clearwayjunk.com",
+  "elena@clearwayjunk.com",
+];
 
 export type Customer = {
   id: string;
@@ -40,6 +50,7 @@ function mapUser(row: {
 
 async function removeDemoAccounts() {
   if (!hasDatabase()) return;
+  await query(`DELETE FROM technicians WHERE lower(email) = ANY($1)`, [demoEmails]);
   await query(`DELETE FROM customers WHERE lower(email) = ANY($1)`, [demoEmails]);
   await query(`DELETE FROM users WHERE lower(email) = ANY($1)`, [demoEmails]);
 }
@@ -65,7 +76,9 @@ export async function findUserById(id: string) {
 }
 
 export async function listAccounts(): Promise<User[]> {
-  if (!hasDatabase()) return listFileUsers();
+  if (!hasDatabase()) {
+    return listFileUsers().filter((user) => !demoEmails.includes(user.email.toLowerCase()));
+  }
   await removeDemoAccounts();
   const result = await query<Parameters<typeof mapUser>[0]>(
     "SELECT id, name, email, phone, password, role, city, zip FROM users ORDER BY name",
@@ -76,6 +89,15 @@ export async function listAccounts(): Promise<User[]> {
 export async function hasStaffAccount() {
   const users = await listAccounts();
   return users.some((user) => user.role === "admin" || user.role === "ops");
+}
+
+export async function listDispatchNotifyTargets() {
+  const users = await listAccounts();
+  const desk = users.filter((user) => user.role === "ops" || user.role === "admin");
+  if (desk.length === 0) {
+    return [{ to: site.email, name: "Clearway dispatch" }];
+  }
+  return desk.map((user) => ({ to: user.email, name: user.name }));
 }
 
 export async function createAccount(input: Omit<User, "id">) {

@@ -11,7 +11,7 @@ import { sendEmail, sendSms } from "@/lib/notify";
 import { saveIntegrationSecrets } from "@/lib/settings";
 import { signalwireConfig, startSignalWireCall } from "@/lib/signalwire";
 import { site } from "@/lib/site";
-import { createTechnician, listTechnicians } from "@/lib/store";
+import { createTechnician, listTechnicians } from "@/lib/technicians";
 import type { EmailKind, UserRole } from "@/lib/types";
 
 function isStaff(role?: string) {
@@ -83,7 +83,7 @@ export async function createPersonAction(formData: FormData) {
     await upsertCustomer({ userId: user.id, name, email, phone, city: city?.name, zip: city?.zip, notes });
   }
   if (role === "tech") {
-    createTechnician({
+    await createTechnician({
       userId: user.id,
       name,
       phone,
@@ -131,7 +131,7 @@ async function recipientsFor(audience: string, oneTo: string, oneName: string) {
       .map((item) => ({ to: item.email, name: item.name, role: "customer" }));
   }
   if (audience === "technicians") {
-    return listTechnicians().map((item) => ({ to: item.email, name: item.name, role: "tech" }));
+    return (await listTechnicians()).map((item) => ({ to: item.email, name: item.name, role: "tech" }));
   }
   if (audience === "dispatch") {
     return users.filter((item) => item.role === "ops" || item.role === "admin").map((item) => ({ to: item.email, name: item.name, role: item.role }));
@@ -175,7 +175,7 @@ export async function sendAdminSmsAction(formData: FormData) {
     const customers = await listCustomers();
     smsTargets.push(...customers.filter((item) => item.phone).map((item) => ({ to: item.phone, name: item.name, role: "customer" })));
   } else if (audience === "technicians") {
-    smsTargets.push(...listTechnicians().map((item) => ({ to: item.phone, name: item.name, role: "tech" })));
+    smsTargets.push(...(await listTechnicians()).map((item) => ({ to: item.phone, name: item.name, role: "tech" })));
   } else {
     const users = await listAccounts();
     const roles = audience === "dispatch" ? ["ops", "admin"] : ["ops", "admin", "tech"];

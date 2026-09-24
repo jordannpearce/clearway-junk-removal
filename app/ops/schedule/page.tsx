@@ -1,4 +1,5 @@
-import { listJobs, listTechnicians } from "@/lib/store";
+import { listJobs } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { StatusBadge } from "@/components/status-badge";
 
 function addDays(offset: number) {
@@ -7,10 +8,10 @@ function addDays(offset: number) {
   return date.toISOString().slice(0, 10);
 }
 
-export default function OpsSchedulePage() {
+export default async function OpsSchedulePage() {
   const days = Array.from({ length: 7 }, (_, index) => addDays(index));
   const jobs = listJobs();
-  const techs = listTechnicians();
+  const techs = await listTechnicians();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -47,7 +48,9 @@ export default function OpsSchedulePage() {
       <section className="mt-8">
         <h2 className="font-heading text-2xl">Technician home bases</h2>
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
-          {techs.map((tech) => (
+          {techs.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No technicians yet. Add them from Admin → People.</p>
+          ) : techs.map((tech) => (
             <span key={tech.id} className="rounded-full border border-border bg-card px-3 py-1">
               {tech.name} · {tech.homeCity}
             </span>

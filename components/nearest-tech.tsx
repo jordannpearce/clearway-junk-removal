@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { closestTechnicians, locationLabel } from "@/lib/location";
 import type { SavedLocation } from "@/lib/types";
 
-export function NearestTech({ location }: { location: SavedLocation | null }) {
-  const matches = closestTechnicians(location, 3);
+export async function NearestTech({ location }: { location: SavedLocation | null }) {
+  const matches = await closestTechnicians(location, 3);
 
   return (
     <Card className="border-primary/15 shadow-none">
@@ -17,7 +17,11 @@ export function NearestTech({ location }: { location: SavedLocation | null }) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {matches.map(({ tech, miles }) => (
+        {matches.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No technicians are on the board yet. Book a haul and Hayward dispatch will assign a crew, or add technicians from Admin → People.
+          </p>
+        ) : matches.map(({ tech, miles }) => (
           <div key={tech.id} className="flex items-start justify-between gap-3 rounded-xl border border-border bg-muted/40 p-3">
             <div>
               <p className="flex items-center gap-2 font-medium">

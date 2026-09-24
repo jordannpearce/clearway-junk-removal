@@ -3,6 +3,7 @@ import { createJob, listJobs } from "@/lib/store";
 import { getService } from "@/lib/services";
 import { findCityByName } from "@/lib/cities";
 import { suggestTechnician } from "@/lib/location";
+import { listDispatchNotifyTargets } from "@/lib/accounts";
 import { notifyJobChange } from "@/lib/notify";
 import type { JobSize } from "@/lib/types";
 
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     zip: String(body.zip || city?.zip || "94541"),
     label: city ? `${city.name}, ${city.county} County` : cityName,
   };
-  const nearest = suggestTechnician(location);
+  const nearest = await suggestTechnician(location);
   const job = createJob({
     customerId: String(body.customerId || "guest"),
     customerName: String(body.name || "Guest customer"),
@@ -42,9 +43,10 @@ export async function POST(request: Request) {
     technicianName: nearest?.tech.name,
     status: nearest ? "confirmed" : "requested",
   });
+  const desk = await listDispatchNotifyTargets();
   await notifyJobChange(job, [
-    { channel: "email", to: job.customerEmail || "ops@clearwayjunk.com", name: job.customerName },
-    { channel: "email", to: "ops@clearwayjunk.com", name: "Clearway dispatch" },
+    { channel: "email", to: job.customerEmail || desk[0]?.to || "", name: job.customerName },
+    ...desk.map((item) => ({ channel: "email" as const, to: item.to, name: item.name })),
   ]);
   return NextResponse.json({ job });
 }

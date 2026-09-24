@@ -28,7 +28,7 @@ Open [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
 If no staff account exists yet, open `/admin/setup` and create the first admin. Customers can still register from `/login`.
 
-Jobs are stored in `data/runtime-store.json` on this machine when no database is configured. Email, SMS, and call logs persist in Postgres when `DATABASE_URL` is set.
+Jobs are stored in `data/runtime-store.json` on this machine when no database is configured. Users, customers, technicians, email, SMS, and call logs persist in Postgres when `DATABASE_URL` is set. There are no seeded technicians or dispatchers. Add them from Admin → People.
 
 ## GitHub and Railway Postgres
 

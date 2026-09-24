@@ -4,7 +4,7 @@ import { hasStaffAccount, listCustomers } from "@/lib/accounts";
 import { listNotificationLog } from "@/lib/comms";
 import { site } from "@/lib/site";
 import { signalwireConfig } from "@/lib/signalwire";
-import { listTechnicians } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ export default async function AdminSmsPage({ searchParams }: PageProps<"/admin/s
   const wire = await signalwireConfig();
   const [customers, notes] = await Promise.all([listCustomers(), listNotificationLog(40)]);
   const texts = notes.filter((item) => item.channel === "sms");
-  const techs = listTechnicians();
+  const techs = await listTechnicians();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">

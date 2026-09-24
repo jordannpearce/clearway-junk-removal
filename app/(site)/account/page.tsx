@@ -5,7 +5,8 @@ import { FormSubmit } from "@/components/form-submit";
 import { LinkButton } from "@/components/link-button";
 import { logoutAction } from "@/lib/actions";
 import { getSession } from "@/lib/auth";
-import { listJobsForCustomer, listJobsForTechnician, listTechnicians } from "@/lib/store";
+import { listJobsForCustomer, listJobsForTechnician } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export default async function AccountPage({ searchParams }: PageProps<"/account"
 
   const query = await searchParams;
   const techRecord = session.role === "tech"
-    ? listTechnicians().find((item) => item.userId === session.userId)
+    ? (await listTechnicians()).find((item) => item.userId === session.userId)
     : undefined;
   const jobs =
     session.role === "tech" && techRecord

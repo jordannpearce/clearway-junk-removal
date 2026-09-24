@@ -2,14 +2,15 @@ import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { listNotificationLog } from "@/lib/comms";
-import { listJobs, listTechnicians } from "@/lib/store";
+import { listJobs } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 
 export default async function OpsHomePage() {
   const jobs = listJobs();
   const open = jobs.filter((job) => !["completed", "cancelled"].includes(job.status));
   const today = new Date().toISOString().slice(0, 10);
   const todayJobs = jobs.filter((job) => job.scheduledDate === today);
-  const techs = listTechnicians().filter((tech) => tech.active);
+  const techs = (await listTechnicians()).filter((tech) => tech.active);
   const notes = await listNotificationLog(5);
 
   return (
@@ -46,7 +47,9 @@ export default async function OpsHomePage() {
           </Link>
         </div>
         <div className="mt-4 space-y-2">
-          {open.slice(0, 6).map((job) => (
+          {open.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No open jobs. New bookings land here for assignment.</p>
+          ) : open.slice(0, 6).map((job) => (
             <div key={job.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3">
               <div>
                 <p className="font-medium">{job.serviceName} · {job.city}</p>

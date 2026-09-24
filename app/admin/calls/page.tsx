@@ -4,7 +4,7 @@ import { hasStaffAccount, listCustomers } from "@/lib/accounts";
 import { listCalls } from "@/lib/comms";
 import { site } from "@/lib/site";
 import { signalwireConfig } from "@/lib/signalwire";
-import { listTechnicians } from "@/lib/store";
+import { listTechnicians } from "@/lib/technicians";
 import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ export default async function AdminCallsPage({ searchParams }: PageProps<"/admin
   if (!(await hasStaffAccount())) redirect("/admin/setup");
   const query = await searchParams;
   const [calls, customers] = await Promise.all([listCalls(50), listCustomers()]);
-  const techs = listTechnicians();
+  const techs = await listTechnicians();
   const wire = await signalwireConfig();
 
   return (
