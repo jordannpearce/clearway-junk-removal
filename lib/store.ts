@@ -39,7 +39,7 @@ function seed(): StoreData {
       id: "user-ops",
       name: demoAccounts.ops.name,
       email: demoAccounts.ops.email,
-      phone: "(510) 555-0192",
+      phone: "(341) 250-3505",
       password: demoAccounts.ops.password,
       role: "ops",
       city: "Hayward",

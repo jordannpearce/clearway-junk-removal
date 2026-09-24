@@ -15,6 +15,7 @@ import {
   getTechnician,
   updateJob,
 } from "@/lib/store";
+import { site } from "@/lib/site";
 import type { JobSize, JobStatus, NotifyChannel } from "@/lib/types";
 
 export async function saveLocationAction(formData: FormData) {
@@ -223,7 +224,7 @@ export async function sendReviewRequestAction(formData: FormData) {
   const job = getJob(id);
   if (!job) redirect("/ops/reviews");
   const subject = "How did Clearway do on your junk haul?";
-  const body = `Hi ${job.customerName},\n\nYour ${job.serviceName} visit in ${job.city} is complete, and we would be grateful for a short review. Tell us what felt careful, what we could improve, and whether you would call us again.\n\nThank you for trusting a Hayward crew.\nClearway Junk Removal\n(510) 555-0192`;
+  const body = `Hi ${job.customerName},\n\nYour ${job.serviceName} visit in ${job.city} is complete, and we would be grateful for a short review. Tell us what felt careful, what we could improve, and whether you would call us again.\n\nThank you for trusting a Hayward crew.\nClearway Junk Removal\n${site.phone}`;
   if (channel === "email") {
     await sendEmail({ to: job.customerEmail, subject, body, jobId: job.id });
   } else {
@@ -252,7 +253,7 @@ export async function contactAction(formData: FormData) {
     await sendEmail({
       to: email,
       subject: "We received your note at Clearway",
-      body: `Hi ${name},\n\nThank you for writing. A dispatcher in Hayward will reply during shop hours. If this is a same-day haul, call (510) 555-0192.\n\nGlad you reached out.`,
+      body: `Hi ${name},\n\nThank you for writing. A dispatcher in Hayward will reply during shop hours. If this is a same-day haul, call ${site.phone}.\n\nGlad you reached out.`,
     });
   }
   redirect("/contact?sent=1");
