@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 import { createAccount, findUserByEmail, findUserById } from "@/lib/accounts";
+import { staffHome } from "@/lib/site";
 import type { Session, UserRole } from "@/lib/types";
+
+export { staffHome };
 
 const cookieName = "clearway_session";
 

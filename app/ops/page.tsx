@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listJobs, listNotifications, listTechnicians } from "@/lib/store";
+import { listNotificationLog } from "@/lib/comms";
+import { listJobs, listTechnicians } from "@/lib/store";
 
-export default function OpsHomePage() {
+export default async function OpsHomePage() {
   const jobs = listJobs();
   const open = jobs.filter((job) => !["completed", "cancelled"].includes(job.status));
   const today = new Date().toISOString().slice(0, 10);
   const todayJobs = jobs.filter((job) => job.scheduledDate === today);
   const techs = listTechnicians().filter((tech) => tech.active);
-  const notes = listNotifications().slice(0, 5);
+  const notes = await listNotificationLog(5);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -62,7 +63,7 @@ export default function OpsHomePage() {
         <h2 className="font-heading text-2xl">Recent notifications</h2>
         <div className="mt-4 space-y-2">
           {notes.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No messages yet. Booking, dispatch, and review requests will appear here. Without API keys they are stored as mocked sends.</p>
+            <p className="text-sm text-muted-foreground">No messages yet. Booking, dispatch, review requests, and admin sends will appear here.</p>
           ) : (
             notes.map((note) => (
               <div key={note.id} className="rounded-xl border border-border bg-card px-4 py-3 text-sm">

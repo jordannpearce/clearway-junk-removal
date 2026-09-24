@@ -30,7 +30,7 @@ export default function TermsPage() {
         </p>
         <h2 className="font-heading text-2xl text-foreground">Accounts and dispatch</h2>
         <p>
-          Customer accounts are for people booking their own hauls. Operations and technician accounts are for Clearway staff. You agree not to share a staff login. Demo passwords shipped with this local package must be changed before any real customer data is stored.
+          Customer accounts are for people booking their own hauls. Admin, dispatch, and technician accounts are for Clearway staff. You agree not to share a staff login.
         </p>
         <h2 className="font-heading text-2xl text-foreground">Liability</h2>
         <p>

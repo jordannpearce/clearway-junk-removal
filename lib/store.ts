@@ -1,6 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
-import { demoAccounts } from "@/lib/site";
 import type {
   Job,
   JobSize,
@@ -24,88 +23,7 @@ function now() {
 }
 
 function seed(): StoreData {
-  const users: User[] = [
-    {
-      id: "user-customer",
-      name: demoAccounts.customer.name,
-      email: demoAccounts.customer.email,
-      phone: "(510) 555-0133",
-      password: demoAccounts.customer.password,
-      role: "customer",
-      city: "Hayward",
-      zip: "94541",
-    },
-    {
-      id: "user-ops",
-      name: demoAccounts.ops.name,
-      email: demoAccounts.ops.email,
-      phone: "(341) 250-3505",
-      password: demoAccounts.ops.password,
-      role: "ops",
-      city: "Hayward",
-      zip: "94541",
-    },
-    {
-      id: "user-tech-andre",
-      name: "Andre Ruiz",
-      email: demoAccounts.tech.email,
-      phone: "(510) 555-0177",
-      password: demoAccounts.tech.password,
-      role: "tech",
-      city: "Hayward",
-      zip: "94541",
-    },
-    {
-      id: "user-tech-priya",
-      name: "Priya Shah",
-      email: "priya@clearwayjunk.com",
-      phone: "(510) 555-0144",
-      password: "tech123",
-      role: "tech",
-      city: "Oakland",
-      zip: "94612",
-    },
-    {
-      id: "user-tech-luis",
-      name: "Luis Ortega",
-      email: "luis@clearwayjunk.com",
-      phone: "(510) 555-0161",
-      password: "tech123",
-      role: "tech",
-      city: "Fremont",
-      zip: "94536",
-    },
-    {
-      id: "user-tech-nina",
-      name: "Nina Brooks",
-      email: "nina@clearwayjunk.com",
-      phone: "(925) 555-0188",
-      password: "tech123",
-      role: "tech",
-      city: "Concord",
-      zip: "94520",
-    },
-    {
-      id: "user-tech-jamal",
-      name: "Jamal Whitaker",
-      email: "jamal@clearwayjunk.com",
-      phone: "(510) 555-0120",
-      password: "tech123",
-      role: "tech",
-      city: "Richmond",
-      zip: "94804",
-    },
-    {
-      id: "user-tech-elena",
-      name: "Elena Vasquez",
-      email: "elena@clearwayjunk.com",
-      phone: "(925) 555-0112",
-      password: "tech123",
-      role: "tech",
-      city: "Walnut Creek",
-      zip: "94596",
-    },
-  ];
+  const users: User[] = [];
 
   const technicians: Technician[] = [
     {
@@ -192,8 +110,8 @@ function seed(): StoreData {
     {
       id: "job-1001",
       customerId: "user-customer",
-      customerName: demoAccounts.customer.name,
-      customerEmail: demoAccounts.customer.email,
+      customerName: "Jordan Hale",
+      customerEmail: "jordan@example.com",
       customerPhone: "(510) 555-0133",
       serviceSlug: "garage-cleanout",
       serviceName: "Garage and storage cleanout",
@@ -213,8 +131,8 @@ function seed(): StoreData {
     {
       id: "job-1002",
       customerId: "user-customer",
-      customerName: demoAccounts.customer.name,
-      customerEmail: demoAccounts.customer.email,
+      customerName: "Jordan Hale",
+      customerEmail: "jordan@example.com",
       customerPhone: "(510) 555-0133",
       serviceSlug: "furniture-removal",
       serviceName: "Furniture removal",
@@ -232,8 +150,8 @@ function seed(): StoreData {
     {
       id: "job-1003",
       customerId: "user-customer",
-      customerName: demoAccounts.customer.name,
-      customerEmail: demoAccounts.customer.email,
+      customerName: "Jordan Hale",
+      customerEmail: "jordan@example.com",
       customerPhone: "(510) 555-0133",
       serviceSlug: "construction-debris-removal",
       serviceName: "Construction debris removal",
@@ -302,6 +220,14 @@ export function listTechnicians() {
 
 export function getTechnician(id: string) {
   return readStore().technicians.find((tech) => tech.id === id);
+}
+
+export function createTechnician(input: Omit<Technician, "id">) {
+  return mutate((data) => {
+    const technician: Technician = { ...input, id: `tech-${crypto.randomUUID().slice(0, 8)}` };
+    data.technicians.unshift(technician);
+    return technician;
+  });
 }
 
 export function listJobs() {

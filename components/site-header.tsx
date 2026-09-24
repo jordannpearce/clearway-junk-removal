@@ -56,8 +56,8 @@ export async function SiteHeader() {
             {location?.city || "Set location"}
           </LinkButton>
           {session ? (
-            <LinkButton href={session.role === "customer" ? "/account" : "/ops"} size="sm">
-              {session.role === "customer" ? "My jobs" : "Dispatch"}
+            <LinkButton href={session.role === "customer" ? "/account" : session.role === "admin" ? "/admin" : "/ops"} size="sm">
+              {session.role === "customer" ? "My jobs" : session.role === "admin" ? "Admin" : "Dispatch"}
             </LinkButton>
           ) : (
             <LinkButton href="/login" variant="outline" size="sm" className="hidden sm:inline-flex">

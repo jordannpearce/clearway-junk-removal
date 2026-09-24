@@ -15,7 +15,7 @@ import {
   getTechnician,
   updateJob,
 } from "@/lib/store";
-import { site } from "@/lib/site";
+import { site, staffHome } from "@/lib/site";
 import type { JobSize, JobStatus, NotifyChannel } from "@/lib/types";
 
 export async function saveLocationAction(formData: FormData) {
@@ -42,7 +42,7 @@ export async function loginAction(formData: FormData) {
     redirect("/login?error=We%20could%20not%20match%20that%20email%20and%20password.");
   }
   await setSession(session);
-  redirect(session.role === "customer" ? "/account" : "/ops");
+  redirect(staffHome(session.role));
 }
 
 export async function registerAction(formData: FormData) {
@@ -191,7 +191,7 @@ export async function cancelJobAction(formData: FormData) {
 
 export async function dispatchJobAction(formData: FormData) {
   const session = await getSession();
-  if (!session || (session.role !== "ops" && session.role !== "tech")) {
+  if (!session || (session.role !== "ops" && session.role !== "tech" && session.role !== "admin")) {
     redirect("/login");
   }
   const id = String(formData.get("id") || "");
@@ -218,7 +218,7 @@ export async function dispatchJobAction(formData: FormData) {
 
 export async function sendReviewRequestAction(formData: FormData) {
   const session = await getSession();
-  if (!session || session.role !== "ops") redirect("/login");
+  if (!session || (session.role !== "ops" && session.role !== "admin")) redirect("/login");
   const id = String(formData.get("id") || "");
   const channel = String(formData.get("channel") || "email") as NotifyChannel;
   const job = getJob(id);
@@ -226,12 +226,13 @@ export async function sendReviewRequestAction(formData: FormData) {
   const subject = "How did Clearway do on your junk haul?";
   const body = `Hi ${job.customerName},\n\nYour ${job.serviceName} visit in ${job.city} is complete, and we would be grateful for a short review. Tell us what felt careful, what we could improve, and whether you would call us again.\n\nThank you for trusting a Hayward crew.\nClearway Junk Removal\n${site.phone}`;
   if (channel === "email") {
-    await sendEmail({ to: job.customerEmail, subject, body, jobId: job.id });
+    await sendEmail({ to: job.customerEmail, subject, body, jobId: job.id, kind: "review" });
   } else {
     await sendSms({
       to: job.customerPhone,
       body: `${subject} Reply or visit your Clearway account. Job ${job.id}.`,
       jobId: job.id,
+      kind: "review",
     });
   }
   updateJob(id, { reviewRequestedAt: new Date().toISOString() });
@@ -261,7 +262,7 @@ export async function contactAction(formData: FormData) {
 
 export async function createOpsJobAction(formData: FormData) {
   const session = await getSession();
-  if (!session || session.role !== "ops") redirect("/login");
+  if (!session || (session.role !== "ops" && session.role !== "admin")) redirect("/login");
   const service = getService(String(formData.get("service") || "household-junk-removal"));
   const cityName = String(formData.get("city") || "Hayward");
   const location = {

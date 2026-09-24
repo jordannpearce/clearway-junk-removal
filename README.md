@@ -10,9 +10,10 @@ A Next.js website for a Hayward, California junk hauling and debris removal comp
 - Guides, FAQ, about, contact, schedule, privacy, and terms
 - Location picker that ranks the nearest technicians
 - Customer accounts for job status, edits, and cancellation
+- Admin area to create customers, technicians, dispatch, and admin users
+- Resend email for marketing, welcome, account-opening, and notification messages
+- SignalWire SMS, review texts, and call tracking
 - Ops dashboard for jobs, dispatch, a seven-day schedule, technicians, and review requests
-- Email through [Resend](https://resend.com) when an API key is present
-- SMS hooks with recommended phone companies
 - No schema markup, by design
 
 ## Run it locally
@@ -25,15 +26,9 @@ npm run dev
 
 Open [http://127.0.0.1:43123](http://127.0.0.1:43123).
 
-### Demo logins
+If no staff account exists yet, open `/admin/setup` and create the first admin. Customers can still register from `/login`.
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Customer | customer@clearwayjunk.com | customer123 |
-| Dispatch | ops@clearwayjunk.com | ops123 |
-| Technician | tech@clearwayjunk.com | tech123 |
-
-Jobs are stored in `data/runtime-store.json` on this machine when no database is configured. That file is created on first use and is gitignored.
+Jobs are stored in `data/runtime-store.json` on this machine when no database is configured. Email, SMS, and call logs persist in Postgres when `DATABASE_URL` is set.
 
 ## GitHub and Railway Postgres
 
@@ -42,23 +37,24 @@ Jobs are stored in `data/runtime-store.json` on this machine when no database is
 
 Users and customers persist in PostgreSQL when `DATABASE_URL` is set (Railway injects this from the Postgres plugin). Without it, the app still runs on the local file store.
 
-The Railway project `clearway-junk-removal` deploys the `web` service from the `main` branch of that GitHub repo and attaches a Postgres plugin. `DATABASE_URL` on `web` is `${{Postgres.DATABASE_URL}}`. The first request that needs accounts creates the `users` and `customers` tables and seeds the demo logins.
+The Railway project `clearway-junk-removal` deploys the `web` service from the `main` branch of that GitHub repo and attaches a Postgres plugin. `DATABASE_URL` on `web` is `${{Postgres.DATABASE_URL}}`. The first request that needs accounts creates the tables. Old demo logins are removed. Create a real admin at `/admin/setup`.
 
 `railway.toml` and `Dockerfile` are included for that deploy. Sitemap, robots, and canonical URLs use `https://clearwayjunkhaul.com`. Set `SITE_URL` on the web service if that domain changes.
 
-## Email and SMS
+## Email, SMS, and calls
 
-Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in `.env.local` to send real mail. Without those keys, messages are written to the ops notification log as mocked sends so you can still demo booking, dispatch, and review requests.
+Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` to send live mail from the admin Email screen.
 
-SMS recommendations for schedule reminders and review texts:
+Set these SignalWire values to send SMS and start tracked calls:
 
-1. **Telnyx** — often the best cost and 10DLC tools for a local East Bay shop
-2. **Twilio** — the most tutorials and the easiest Node SDK
-3. **Bandwidth** — strong if you also want voice or to port a 510 / 925 number
-4. **Plivo** — a simpler SMS-only API
-5. **Vonage** — useful if dispatchers also want click-to-call
+- `SIGNALWIRE_SPACE` — your space host, such as `example.signalwire.com`
+- `SIGNALWIRE_PROJECT_ID`
+- `SIGNALWIRE_API_TOKEN`
+- `SIGNALWIRE_FROM_NUMBER` — E.164, such as `+13412503505`
 
-United States application-to-person SMS requires 10DLC brand registration. Set `SMS_PROVIDER` and `SMS_API_KEY` when you connect one. Until then, SMS is logged as mocked.
+Point the SignalWire number’s messaging webhook at `https://clearwayjunkhaul.com/api/signalwire/sms`. Without those keys, email, SMS, and calls are stored in the admin log so you can still write copy and practice the desk.
+
+United States application-to-person SMS still needs 10DLC brand registration on the SignalWire number.
 
 ## Notes on the writing
 

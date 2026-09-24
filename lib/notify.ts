@@ -1,45 +1,8 @@
 import { Resend } from "resend";
-import { addNotification } from "@/lib/store";
+import { recordNotification } from "@/lib/comms";
+import { sendSignalWireSms, signalwireConfig } from "@/lib/signalwire";
 import { site } from "@/lib/site";
 import type { Job, NotifyChannel } from "@/lib/types";
-
-const smsProviders = [
-  {
-    name: "Telnyx",
-    bestFor: "East Bay businesses that want lower per-message cost and strong 10DLC tools",
-    notes:
-      "Good default for a Hayward operator. You register your local brand once, then send reminders and review requests from a California number.",
-    url: "https://telnyx.com/products/sms-api",
-  },
-  {
-    name: "Twilio",
-    bestFor: "Teams that want the most tutorials, a mature Node SDK, and easy Resend-like developer flow",
-    notes:
-      "The usual starting point. A1/10DLC registration is required for application-to-person SMS in the United States. Excellent docs for Next.js.",
-    url: "https://www.twilio.com/en-us/messaging/channels/sms",
-  },
-  {
-    name: "Bandwidth",
-    bestFor: "Operators already buying local phone numbers or wanting a carrier-style CPaaS",
-    notes:
-      "Strong if you also want voice dispatch or to port a Hayward (510) or Contra Costa (925) number onto the same account.",
-    url: "https://www.bandwidth.com/messaging/sms/",
-  },
-  {
-    name: "Plivo",
-    bestFor: "Simple SMS APIs with straightforward pricing",
-    notes: "A lighter alternative when you only need reminders, not a full contact-center stack.",
-    url: "https://www.plivo.com/sms/",
-  },
-  {
-    name: "Vonage",
-    bestFor: "Combined voice plus SMS if dispatchers also call customers",
-    notes: "Useful when your ops desk wants click-to-call and text from one platform.",
-    url: "https://www.vonage.com/communications-apis/messages/",
-  },
-] as const;
-
-export const recommendedSmsProviders = smsProviders;
 
 function resendClient() {
   const key = process.env.RESEND_API_KEY;
@@ -47,16 +10,22 @@ function resendClient() {
   return new Resend(key);
 }
 
+export function resendConfigured() {
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
 export async function sendEmail(input: {
   to: string;
   subject: string;
   body: string;
   jobId?: string;
+  kind?: string;
+  audience?: string;
 }) {
   const from = process.env.RESEND_FROM_EMAIL || `Clearway Junk Removal <${site.email}>`;
   const client = resendClient();
   if (!client) {
-    return addNotification({
+    return recordNotification({
       jobId: input.jobId,
       channel: "email",
       to: input.to,
@@ -64,16 +33,18 @@ export async function sendEmail(input: {
       body: input.body,
       provider: "resend-mock",
       status: "mocked",
+      kind: input.kind,
+      audience: input.audience,
     });
   }
   try {
-    await client.emails.send({
+    const result = await client.emails.send({
       from,
       to: input.to,
       subject: input.subject,
       text: input.body,
     });
-    return addNotification({
+    return recordNotification({
       jobId: input.jobId,
       channel: "email",
       to: input.to,
@@ -81,10 +52,13 @@ export async function sendEmail(input: {
       body: input.body,
       provider: "resend",
       status: "sent",
+      kind: input.kind,
+      audience: input.audience,
+      externalId: result.data?.id,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Resend send failed";
-    return addNotification({
+    return recordNotification({
       jobId: input.jobId,
       channel: "email",
       to: input.to,
@@ -92,36 +66,75 @@ export async function sendEmail(input: {
       body: `${input.body}\n\nError: ${message}`,
       provider: "resend",
       status: "failed",
+      kind: input.kind,
+      audience: input.audience,
     });
   }
 }
 
-export async function sendSms(input: { to: string; body: string; jobId?: string }) {
-  const provider = process.env.SMS_PROVIDER || "mock";
-  const token = process.env.SMS_API_KEY;
-  if (!token || provider === "mock") {
-    return addNotification({
+export async function sendSms(input: {
+  to: string;
+  body: string;
+  jobId?: string;
+  kind?: string;
+  audience?: string;
+}) {
+  const config = signalwireConfig();
+  if (!config.configured) {
+    return recordNotification({
+      jobId: input.jobId,
+      channel: "sms",
+      to: input.to,
+      subject: input.kind === "review" ? "Review request" : "SMS",
+      body: input.body,
+      provider: "signalwire-mock",
+      status: "mocked",
+      kind: input.kind || "sms",
+      audience: input.audience,
+    });
+  }
+  try {
+    const result = await sendSignalWireSms({ to: input.to, body: input.body });
+    if (!result.ok) {
+      return recordNotification({
+        jobId: input.jobId,
+        channel: "sms",
+        to: input.to,
+        subject: "SMS",
+        body: `${input.body}\n\nError: ${result.error}`,
+        provider: "signalwire",
+        status: "failed",
+        kind: input.kind || "sms",
+        audience: input.audience,
+        externalId: result.id,
+      });
+    }
+    return recordNotification({
       jobId: input.jobId,
       channel: "sms",
       to: input.to,
       subject: "SMS",
       body: input.body,
-      provider: `${provider}-mock`,
-      status: "mocked",
+      provider: "signalwire",
+      status: "queued",
+      kind: input.kind || "sms",
+      audience: input.audience,
+      externalId: result.id,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "SignalWire SMS failed";
+    return recordNotification({
+      jobId: input.jobId,
+      channel: "sms",
+      to: input.to,
+      subject: "SMS",
+      body: `${input.body}\n\nError: ${message}`,
+      provider: "signalwire",
+      status: "failed",
+      kind: input.kind || "sms",
+      audience: input.audience,
     });
   }
-
-  // Provider-specific implementations can be added when keys are present.
-  // We keep the send path honest: without a configured integration we mock.
-  return addNotification({
-    jobId: input.jobId,
-    channel: "sms",
-    to: input.to,
-    subject: "SMS",
-    body: input.body,
-    provider,
-    status: "mocked",
-  });
 }
 
 export async function notifyPeople(input: {
@@ -130,11 +143,24 @@ export async function notifyPeople(input: {
   subject: string;
   body: string;
   jobId?: string;
+  kind?: string;
 }) {
   if (input.channel === "email") {
-    return sendEmail(input);
+    return sendEmail({ ...input, kind: input.kind || "notification" });
   }
-  return sendSms({ to: input.to, body: `${input.subject}\n\n${input.body}`, jobId: input.jobId });
+  if (input.channel === "sms") {
+    return sendSms({ to: input.to, body: `${input.subject}\n\n${input.body}`, jobId: input.jobId, kind: input.kind || "notification" });
+  }
+  return recordNotification({
+    jobId: input.jobId,
+    channel: "call",
+    to: input.to,
+    subject: input.subject,
+    body: input.body,
+    provider: "manual",
+    status: "logged",
+    kind: input.kind,
+  });
 }
 
 export function jobStatusMessage(job: Job) {
@@ -170,6 +196,7 @@ export async function notifyJobChange(job: Job, audience: Array<{ channel: Notif
         subject,
         body: `Hi ${person.name},\n\n${body}\n\nJob ${job.id}\n${job.address}, ${job.city} ${job.zip}\n${site.phone}`,
         jobId: job.id,
+        kind: "notification",
       }),
     );
   }

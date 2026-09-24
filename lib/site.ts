@@ -24,8 +24,8 @@ export function publicSiteUrl() {
   return site.url;
 }
 
-export const demoAccounts = {
-  customer: { email: "customer@clearwayjunk.com", password: "customer123", name: "Jordan Hale" },
-  ops: { email: "ops@clearwayjunk.com", password: "ops123", name: "Maya Chen" },
-  tech: { email: "tech@clearwayjunk.com", password: "tech123", name: "Andre Ruiz" },
-} as const;
+export function staffHome(role: string) {
+  if (role === "admin") return "/admin";
+  if (role === "customer") return "/account";
+  return "/ops";
+}

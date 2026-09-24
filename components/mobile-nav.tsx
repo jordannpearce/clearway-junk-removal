@@ -49,8 +49,8 @@ export function MobileNav({
               {link.label}
             </Link>
           ))}
-          <Link href={signedIn ? (role === "customer" ? "/account" : "/ops") : "/login"} className="text-base font-medium">
-            {signedIn ? (role === "customer" ? "My jobs" : "Ops dashboard") : "Sign in"}
+          <Link href={signedIn ? (role === "customer" ? "/account" : role === "admin" ? "/admin" : "/ops") : "/login"} className="text-base font-medium">
+            {signedIn ? (role === "customer" ? "My jobs" : role === "admin" ? "Admin" : "Ops dashboard") : "Sign in"}
           </Link>
         </div>
       </SheetContent>

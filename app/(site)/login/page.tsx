@@ -1,10 +1,11 @@
 import { loginAction, registerAction } from "@/lib/actions";
-import { demoAccounts } from "@/lib/site";
+import { hasStaffAccount } from "@/lib/accounts";
 import { pageMeta } from "@/lib/seo";
 import { FormSubmit } from "@/components/form-submit";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
 
 export const metadata = pageMeta({
   title: "Sign in",
@@ -15,14 +16,24 @@ export const metadata = pageMeta({
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const query = await searchParams;
   const error = typeof query.error === "string" ? query.error : "";
+  const staffReady = await hasStaffAccount();
 
   return (
     <div className="mx-auto max-w-xl px-4 py-14 sm:px-6">
       <h1 className="font-heading text-4xl">Sign in to your jobs</h1>
       <p className="mt-4 text-muted-foreground">
-        Customers track, edit, and cancel hauls. Dispatchers and technicians open the operations board. Demo accounts are included so you can try both sides on this local site.
+        Customers track, edit, and cancel hauls. Dispatchers and technicians open the operations board. Admins manage people, email, SMS, and call tracking.
       </p>
       {error ? <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</p> : null}
+      {!staffReady ? (
+        <p className="mt-4 rounded-xl bg-secondary p-3 text-sm">
+          No staff account exists yet.{" "}
+          <Link href="/admin/setup" className="underline">
+            Create the first admin
+          </Link>
+          .
+        </p>
+      ) : null}
       <Tabs defaultValue="signin" className="mt-8">
         <TabsList>
           <TabsTrigger value="signin">Sign in</TabsTrigger>
@@ -63,12 +74,6 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
           </form>
         </TabsContent>
       </Tabs>
-      <div className="mt-6 rounded-2xl bg-secondary/70 p-4 text-sm leading-relaxed">
-        <p className="font-medium">Demo logins</p>
-        <p className="mt-2">Customer: {demoAccounts.customer.email} / {demoAccounts.customer.password}</p>
-        <p>Dispatch: {demoAccounts.ops.email} / {demoAccounts.ops.password}</p>
-        <p>Technician: {demoAccounts.tech.email} / {demoAccounts.tech.password}</p>
-      </div>
     </div>
   );
 }

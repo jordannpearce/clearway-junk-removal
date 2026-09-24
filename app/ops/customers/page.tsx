@@ -13,7 +13,7 @@ export default async function CustomersPage() {
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
         {usingPostgres
           ? "These records live in Railway Postgres. New sign-ups and booked hauls write a customer row automatically."
-          : "No DATABASE_URL yet, so this list is the local demo store. After GitHub and Railway are authorized, customers persist in Postgres."}
+          : "No DATABASE_URL yet, so this list is the local store. Connect Postgres to persist customers."}
       </p>
       <div className="mt-6 overflow-x-auto rounded-2xl border border-border bg-card">
         <table className="w-full min-w-[720px] text-left text-sm">

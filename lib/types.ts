@@ -1,4 +1,4 @@
-export type UserRole = "customer" | "ops" | "tech";
+export type UserRole = "customer" | "ops" | "tech" | "admin";
 
 export type JobStatus =
   | "requested"
@@ -11,7 +11,9 @@ export type JobStatus =
 
 export type JobSize = "truck-quarter" | "truck-half" | "truck-three-quarter" | "truck-full";
 
-export type NotifyChannel = "email" | "sms";
+export type NotifyChannel = "email" | "sms" | "call";
+
+export type EmailKind = "marketing" | "welcome" | "account_opening" | "notification" | "review";
 
 export type User = {
   id: string;
@@ -69,7 +71,26 @@ export type NotificationLog = {
   subject: string;
   body: string;
   provider: string;
-  status: "sent" | "mocked" | "failed";
+  status: "sent" | "mocked" | "failed" | "queued" | "logged";
+  kind?: string;
+  audience?: string;
+  externalId?: string;
+  createdAt: string;
+};
+
+export type CallRecord = {
+  id: string;
+  direction: "outbound" | "inbound";
+  fromNumber: string;
+  toNumber: string;
+  contactName: string;
+  contactRole: "customer" | "tech" | "ops" | "other";
+  purpose: string;
+  notes: string;
+  durationSeconds?: number;
+  status: string;
+  provider: string;
+  externalId?: string;
   createdAt: string;
 };
 

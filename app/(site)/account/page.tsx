@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function AccountPage({ searchParams }: PageProps<"/account">) {
   const session = await getSession();
   if (!session) redirect("/login");
-  if (session.role === "ops") redirect("/ops");
+  if (session.role === "ops" || session.role === "admin") redirect(session.role === "admin" ? "/admin" : "/ops");
 
   const query = await searchParams;
   const techRecord = session.role === "tech"

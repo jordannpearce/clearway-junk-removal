@@ -1,26 +1,30 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Truck } from "lucide-react";
+import { Shield } from "lucide-react";
 import { logoutAction } from "@/lib/actions";
+import { hasStaffAccount } from "@/lib/accounts";
 import { getSession } from "@/lib/auth";
 import { FormSubmit } from "@/components/form-submit";
 
 export const dynamic = "force-dynamic";
 
 const links = [
-  { href: "/ops", label: "Overview" },
-  { href: "/ops/jobs", label: "Jobs" },
-  { href: "/ops/dispatch", label: "Dispatch" },
-  { href: "/ops/schedule", label: "Schedule" },
-  { href: "/ops/technicians", label: "Technicians" },
-  { href: "/ops/customers", label: "Customers" },
-  { href: "/ops/reviews", label: "Review requests" },
-  { href: "/admin", label: "Admin" },
+  { href: "/admin", label: "Overview" },
+  { href: "/admin/people", label: "People" },
+  { href: "/admin/email", label: "Email" },
+  { href: "/admin/sms", label: "SMS" },
+  { href: "/admin/calls", label: "Calls" },
+  { href: "/admin/notifications", label: "Notifications" },
+  { href: "/ops", label: "Dispatch board" },
 ];
 
-export default async function OpsLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
-  if (!session || (session.role !== "ops" && session.role !== "tech" && session.role !== "admin")) {
+  const staffReady = await hasStaffAccount();
+  if (!staffReady) {
+    return <div className="min-h-full flex-1 bg-muted/30">{children}</div>;
+  }
+  if (!session || (session.role !== "admin" && session.role !== "ops")) {
     redirect("/login");
   }
 
@@ -28,9 +32,9 @@ export default async function OpsLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-full flex-1">
       <aside className="hidden w-64 shrink-0 bg-sidebar text-sidebar-foreground md:flex md:flex-col">
         <div className="flex items-center gap-2 px-5 py-5">
-          <Truck className="size-5" />
+          <Shield className="size-5" />
           <div>
-            <p className="font-heading text-lg">Clearway Ops</p>
+            <p className="font-heading text-lg">Clearway Admin</p>
             <p className="text-xs text-sidebar-foreground/70">{session.name}</p>
           </div>
         </div>

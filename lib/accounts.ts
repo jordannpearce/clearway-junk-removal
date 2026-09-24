@@ -1,7 +1,8 @@
-import { demoAccounts } from "@/lib/site";
 import { hasDatabase, query } from "@/lib/db";
-import { createUser as createFileUser, getUserByEmail as getFileUserByEmail, getUserById as getFileUserById } from "@/lib/store";
+import { createUser as createFileUser, getUserByEmail as getFileUserByEmail, getUserById as getFileUserById, listUsers as listFileUsers } from "@/lib/store";
 import type { User, UserRole } from "@/lib/types";
+
+const demoEmails = ["customer@clearwayjunk.com", "ops@clearwayjunk.com", "tech@clearwayjunk.com"];
 
 export type Customer = {
   id: string;
@@ -37,63 +38,15 @@ function mapUser(row: {
   };
 }
 
-const seedUsers: User[] = [
-  {
-    id: "user-customer",
-    name: demoAccounts.customer.name,
-    email: demoAccounts.customer.email,
-    phone: "(510) 555-0133",
-    password: demoAccounts.customer.password,
-    role: "customer",
-    city: "Hayward",
-    zip: "94541",
-  },
-  {
-    id: "user-ops",
-    name: demoAccounts.ops.name,
-    email: demoAccounts.ops.email,
-    phone: "(341) 250-3505",
-    password: demoAccounts.ops.password,
-    role: "ops",
-    city: "Hayward",
-    zip: "94541",
-  },
-  {
-    id: "user-tech-andre",
-    name: "Andre Ruiz",
-    email: demoAccounts.tech.email,
-    phone: "(510) 555-0177",
-    password: demoAccounts.tech.password,
-    role: "tech",
-    city: "Hayward",
-    zip: "94541",
-  },
-];
-
-async function seedDatabase() {
-  const existing = await query<{ count: string }>("SELECT count(*)::text FROM users");
-  if (Number(existing.rows[0]?.count || 0) > 0) return;
-  for (const user of seedUsers) {
-    await query(
-      `INSERT INTO users (id, name, email, phone, password, role, city, zip)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       ON CONFLICT (email) DO NOTHING`,
-      [user.id, user.name, user.email, user.phone, user.password, user.role, user.city || null, user.zip || null],
-    );
-    if (user.role === "customer") {
-      await query(
-        `INSERT INTO customers (id, user_id, name, email, phone, city, zip, notes)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT (id) DO NOTHING`,
-        [`cust-${user.id}`, user.id, user.name, user.email, user.phone, user.city || null, user.zip || null, "Seeded Hayward demo customer"],
-      );
-    }
-  }
+async function removeDemoAccounts() {
+  if (!hasDatabase()) return;
+  await query(`DELETE FROM customers WHERE lower(email) = ANY($1)`, [demoEmails]);
+  await query(`DELETE FROM users WHERE lower(email) = ANY($1)`, [demoEmails]);
 }
 
 export async function findUserByEmail(email: string) {
   if (!hasDatabase()) return getFileUserByEmail(email);
-  await seedDatabase();
+  await removeDemoAccounts();
   const result = await query<Parameters<typeof mapUser>[0]>(
     "SELECT id, name, email, phone, password, role, city, zip FROM users WHERE lower(email) = lower($1)",
     [email],
@@ -103,7 +56,7 @@ export async function findUserByEmail(email: string) {
 
 export async function findUserById(id: string) {
   if (!hasDatabase()) return getFileUserById(id);
-  await seedDatabase();
+  await removeDemoAccounts();
   const result = await query<Parameters<typeof mapUser>[0]>(
     "SELECT id, name, email, phone, password, role, city, zip FROM users WHERE id = $1",
     [id],
@@ -111,12 +64,25 @@ export async function findUserById(id: string) {
   return result.rows[0] ? mapUser(result.rows[0]) : undefined;
 }
 
+export async function listAccounts(): Promise<User[]> {
+  if (!hasDatabase()) return listFileUsers();
+  await removeDemoAccounts();
+  const result = await query<Parameters<typeof mapUser>[0]>(
+    "SELECT id, name, email, phone, password, role, city, zip FROM users ORDER BY name",
+  );
+  return result.rows.map(mapUser);
+}
+
+export async function hasStaffAccount() {
+  const users = await listAccounts();
+  return users.some((user) => user.role === "admin" || user.role === "ops");
+}
+
 export async function createAccount(input: Omit<User, "id">) {
   if (!hasDatabase()) {
-    const user = createFileUser(input);
-    return user;
+    return createFileUser(input);
   }
-  await seedDatabase();
+  await removeDemoAccounts();
   const user: User = { ...input, id: `user-${crypto.randomUUID()}` };
   await query(
     `INSERT INTO users (id, name, email, phone, password, role, city, zip)
@@ -147,7 +113,6 @@ export async function upsertCustomer(input: {
   notes?: string;
 }) {
   if (!hasDatabase()) return null;
-  await seedDatabase();
   const existing = await query<{ id: string }>(
     "SELECT id FROM customers WHERE lower(email) = lower($1) LIMIT 1",
     [input.email],
@@ -171,8 +136,7 @@ export async function upsertCustomer(input: {
 
 export async function listCustomers(): Promise<Customer[]> {
   if (!hasDatabase()) {
-    const { listUsers } = await import("@/lib/store");
-    return listUsers()
+    return listFileUsers()
       .filter((user) => user.role === "customer")
       .map((user) => ({
         id: `cust-${user.id}`,
@@ -182,11 +146,10 @@ export async function listCustomers(): Promise<Customer[]> {
         phone: user.phone,
         city: user.city,
         zip: user.zip,
-        notes: "Local file store — connect Railway Postgres to persist customers.",
+        notes: "",
         createdAt: new Date().toISOString(),
       }));
   }
-  await seedDatabase();
   const result = await query<{
     id: string;
     user_id: string | null;
