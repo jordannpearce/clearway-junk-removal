@@ -1,18 +1,17 @@
 import { publicSiteUrl } from "@/lib/site";
 import { toE164 } from "@/lib/phone";
+import { getIntegrationSecrets } from "@/lib/settings";
 
-export function signalwireConfig() {
-  const spaceRaw = process.env.SIGNALWIRE_SPACE || process.env.SIGNALWIRE_SPACE_URL || "";
-  const projectId = process.env.SIGNALWIRE_PROJECT_ID || "";
-  const token = process.env.SIGNALWIRE_API_TOKEN || process.env.SIGNALWIRE_TOKEN || "";
-  const fromNumber = process.env.SIGNALWIRE_FROM_NUMBER || process.env.SIGNALWIRE_PHONE_NUMBER || "";
-  const space = spaceRaw.replace(/^https?:\/\//, "").replace(/\/$/, "");
+export async function signalwireConfig() {
+  const secrets = await getIntegrationSecrets();
   return {
-    space,
-    projectId,
-    token,
-    fromNumber,
-    configured: Boolean(space && projectId && token && fromNumber),
+    space: secrets.signalwireSpace,
+    projectId: secrets.signalwireProjectId,
+    token: secrets.signalwireApiToken,
+    fromNumber: secrets.signalwireFromNumber,
+    configured: Boolean(
+      secrets.signalwireSpace && secrets.signalwireProjectId && secrets.signalwireApiToken && secrets.signalwireFromNumber,
+    ),
   };
 }
 
@@ -30,7 +29,7 @@ async function parseBody(response: Response) {
 }
 
 export async function sendSignalWireSms(input: { to: string; body: string }) {
-  const config = signalwireConfig();
+  const config = await signalwireConfig();
   if (!config.configured) {
     return { ok: false, mocked: true, id: "", error: "SignalWire is not configured." };
   }
@@ -61,7 +60,7 @@ export async function sendSignalWireSms(input: { to: string; body: string }) {
 }
 
 export async function startSignalWireCall(input: { to: string; contactName?: string }) {
-  const config = signalwireConfig();
+  const config = await signalwireConfig();
   if (!config.configured) {
     return { ok: false, mocked: true, id: "", error: "SignalWire is not configured." };
   }

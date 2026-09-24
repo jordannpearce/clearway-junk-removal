@@ -8,6 +8,7 @@ import { applyTemplate, defaultEmailCopy, emailKinds } from "@/lib/email-templat
 import { getSession, setSession } from "@/lib/auth";
 import { findCityByName } from "@/lib/cities";
 import { sendEmail, sendSms } from "@/lib/notify";
+import { saveIntegrationSecrets } from "@/lib/settings";
 import { signalwireConfig, startSignalWireCall } from "@/lib/signalwire";
 import { site } from "@/lib/site";
 import { createTechnician, listTechnicians } from "@/lib/store";
@@ -216,7 +217,7 @@ export async function startCallAction(formData: FormData) {
   await requireStaff();
   const to = String(formData.get("to") || "");
   const name = String(formData.get("name") || "");
-  const config = signalwireConfig();
+  const config = await signalwireConfig();
   const result = await startSignalWireCall({ to, contactName: name });
   await recordCall({
     direction: "outbound",
@@ -238,4 +239,29 @@ export async function loadEmailTemplateAction(formData: FormData) {
   await requireStaff();
   const kind = String(formData.get("kind") || "notification");
   redirect(`/admin/email?kind=${encodeURIComponent(kind)}`);
+}
+
+export async function saveIntegrationSettingsAction(formData: FormData) {
+  const session = await requireStaff();
+  if (session.role !== "admin") {
+    redirect("/admin/settings?error=Only%20an%20admin%20can%20change%20API%20keys.");
+  }
+  const optional = (key: string) => {
+    const value = String(formData.get(key) || "").trim();
+    return value || undefined;
+  };
+  await saveIntegrationSecrets({
+    resendApiKey: optional("resend_api_key"),
+    resendFromEmail: optional("resend_from_email"),
+    signalwireSpace: optional("signalwire_space"),
+    signalwireProjectId: optional("signalwire_project_id"),
+    signalwireApiToken: optional("signalwire_api_token"),
+    signalwireFromNumber: optional("signalwire_from_number"),
+  });
+  revalidatePath("/admin");
+  revalidatePath("/admin/settings");
+  revalidatePath("/admin/email");
+  revalidatePath("/admin/sms");
+  revalidatePath("/admin/calls");
+  redirect("/admin/settings?saved=1");
 }

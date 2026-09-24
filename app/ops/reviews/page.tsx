@@ -9,7 +9,7 @@ export default async function ReviewsPage({ searchParams }: PageProps<"/ops/revi
   const query = await searchParams;
   const completed = listJobs().filter((job) => job.status === "completed");
   const notes = (await listNotificationLog(40)).filter((note) => note.kind === "review" || note.subject.toLowerCase().includes("review") || note.body.toLowerCase().includes("review"));
-  const wire = signalwireConfig();
+  const wire = await signalwireConfig();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">

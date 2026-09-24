@@ -68,7 +68,13 @@ CREATE TABLE IF NOT EXISTS calls (
 );
 
 CREATE INDEX IF NOT EXISTS calls_created_idx ON calls (created_at DESC);
-`;
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL DEFAULT '',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+`
 
 export function databaseUrl() {
   return process.env.DATABASE_URL || process.env.POSTGRES_URL || "";

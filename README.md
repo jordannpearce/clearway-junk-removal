@@ -43,6 +43,8 @@ The Railway project `clearway-junk-removal` deploys the `web` service from the `
 
 ## Email, SMS, and calls
 
+The safest place for keys is Railway Variables on the `web` service. You can also paste them in Admin → API keys. Railway values override the admin form.
+
 Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` to send live mail from the admin Email screen.
 
 Set these SignalWire values to send SMS and start tracked calls:

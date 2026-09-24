@@ -34,8 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
-# local job store
+# local job store and admin-saved secrets
 /data/runtime-store.json
+/data/app-settings.json
 
 # vercel
 .vercel

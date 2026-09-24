@@ -17,8 +17,7 @@ export default async function AdminHomePage() {
   ]);
   const techs = listTechnicians().filter((item) => item.active);
   const jobs = listJobs().filter((job) => !["completed", "cancelled"].includes(job.status));
-  const resend = resendConfigured();
-  const wire = signalwireConfig();
+  const [resend, wire] = await Promise.all([resendConfigured(), signalwireConfig()]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -50,9 +49,10 @@ export default async function AdminHomePage() {
           <CardContent className="text-sm text-muted-foreground">
             {resend
               ? "API key is set. Marketing, welcome, account-opening, and notification mail go out live."
-              : "No RESEND_API_KEY yet. Messages are stored in the notification log so you can still write and preview them."}
-            <div className="mt-3">
+              : "No Resend key yet. Add it under API keys, or messages stay in the notification log."}
+            <div className="mt-3 flex gap-4">
               <Link href="/admin/email" className="text-primary underline">Compose email</Link>
+              <Link href="/admin/settings" className="text-primary underline">API keys</Link>
             </div>
           </CardContent>
         </Card>
@@ -61,10 +61,11 @@ export default async function AdminHomePage() {
           <CardContent className="text-sm text-muted-foreground">
             {wire.configured
               ? `Connected to ${wire.space}. Review texts, job SMS, and click-to-call use ${wire.fromNumber}.`
-              : "Add SIGNALWIRE_SPACE, SIGNALWIRE_PROJECT_ID, SIGNALWIRE_API_TOKEN, and SIGNALWIRE_FROM_NUMBER. Until then, SMS and calls are logged as mocked sends."}
+              : "Add SignalWire under API keys. Until then, SMS and calls are logged as mocked sends."}
             <div className="mt-3 flex gap-4">
               <Link href="/admin/sms" className="text-primary underline">Send SMS</Link>
               <Link href="/admin/calls" className="text-primary underline">Call tracking</Link>
+              <Link href="/admin/settings" className="text-primary underline">API keys</Link>
             </div>
           </CardContent>
         </Card>

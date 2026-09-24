@@ -1,17 +1,13 @@
 import { Resend } from "resend";
 import { recordNotification } from "@/lib/comms";
+import { getIntegrationSecrets } from "@/lib/settings";
 import { sendSignalWireSms, signalwireConfig } from "@/lib/signalwire";
 import { site } from "@/lib/site";
 import type { Job, NotifyChannel } from "@/lib/types";
 
-function resendClient() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return null;
-  return new Resend(key);
-}
-
-export function resendConfigured() {
-  return Boolean(process.env.RESEND_API_KEY);
+export async function resendConfigured() {
+  const secrets = await getIntegrationSecrets();
+  return Boolean(secrets.resendApiKey);
 }
 
 export async function sendEmail(input: {
@@ -22,8 +18,9 @@ export async function sendEmail(input: {
   kind?: string;
   audience?: string;
 }) {
-  const from = process.env.RESEND_FROM_EMAIL || `Clearway Junk Removal <${site.email}>`;
-  const client = resendClient();
+  const secrets = await getIntegrationSecrets();
+  const from = secrets.resendFromEmail || `Clearway Junk Removal <${site.email}>`;
+  const client = secrets.resendApiKey ? new Resend(secrets.resendApiKey) : null;
   if (!client) {
     return recordNotification({
       jobId: input.jobId,
@@ -79,7 +76,7 @@ export async function sendSms(input: {
   kind?: string;
   audience?: string;
 }) {
-  const config = signalwireConfig();
+  const config = await signalwireConfig();
   if (!config.configured) {
     return recordNotification({
       jobId: input.jobId,

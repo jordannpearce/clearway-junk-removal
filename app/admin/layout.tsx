@@ -15,6 +15,7 @@ const links = [
   { href: "/admin/sms", label: "SMS" },
   { href: "/admin/calls", label: "Calls" },
   { href: "/admin/notifications", label: "Notifications" },
+  { href: "/admin/settings", label: "API keys" },
   { href: "/ops", label: "Dispatch board" },
 ];
 

@@ -23,7 +23,7 @@ export default async function AdminEmailPage({ searchParams }: PageProps<"/admin
       <h1 className="font-heading text-3xl">Email</h1>
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
         Send marketing, welcome, account-opening, and notification mail through Resend.
-        {resendConfigured() ? " The live API key is connected." : " Without RESEND_API_KEY the send is stored in the log so you can still write the copy."}
+        {(await resendConfigured()) ? " The live API key is connected." : " Add a Resend key under API keys, or the send is stored in the log."}
       </p>
       {query.sent ? <p className="mt-4 rounded-xl bg-secondary p-3 text-sm">Sent {query.sent} email{query.sent === "1" ? "" : "s"}.</p> : null}
       {query.error ? <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{query.error}</p> : null}

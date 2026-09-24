@@ -15,7 +15,7 @@ export default async function AdminCallsPage({ searchParams }: PageProps<"/admin
   const query = await searchParams;
   const [calls, customers] = await Promise.all([listCalls(50), listCustomers()]);
   const techs = listTechnicians();
-  const wire = signalwireConfig();
+  const wire = await signalwireConfig();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">

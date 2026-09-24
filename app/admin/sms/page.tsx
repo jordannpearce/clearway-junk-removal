@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 export default async function AdminSmsPage({ searchParams }: PageProps<"/admin/sms">) {
   if (!(await hasStaffAccount())) redirect("/admin/setup");
   const query = await searchParams;
-  const wire = signalwireConfig();
+  const wire = await signalwireConfig();
   const [customers, notes] = await Promise.all([listCustomers(), listNotificationLog(40)]);
   const texts = notes.filter((item) => item.channel === "sms");
   const techs = listTechnicians();
