@@ -43,18 +43,23 @@ The Railway project `clearway-junk-removal` deploys the `web` service from the `
 
 ## Email, SMS, and calls
 
-The safest place for keys is Railway Variables on the `web` service. You can also paste them in Admin → API keys. Railway values override the admin form.
+The safest place for keys is Railway Variables on the `web` service, not the dashboard form. You can also paste them in Admin → API keys. Railway environment variables override anything saved in admin.
 
-Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` to send live mail from the admin Email screen.
+On Railway: open the project, choose the `web` service, then Variables. Set:
 
-Set these SignalWire values to send SMS and start tracked calls:
-
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL`
 - `SIGNALWIRE_SPACE` — your space host, such as `example.signalwire.com`
 - `SIGNALWIRE_PROJECT_ID`
 - `SIGNALWIRE_API_TOKEN`
 - `SIGNALWIRE_FROM_NUMBER` — E.164, such as `+13412503505`
+- `SITE_URL=https://clearwayjunkhaul.com`
+
+The Admin → API keys form stores values in the Postgres `settings` table when `DATABASE_URL` is set, or in `data/app-settings.json` on this machine. After save, the form never shows a full secret again — only a mask such as `••••last4`. Leave a secret field blank to keep the value that is already stored.
 
 Point the SignalWire number’s messaging webhook at `https://clearwayjunkhaul.com/api/signalwire/sms`. Without those keys, email, SMS, and calls are stored in the admin log so you can still write copy and practice the desk.
+
+Create the first live admin at `/admin/setup` if you have not already, then add Resend and SignalWire keys in either Railway or Admin → API keys.
 
 United States application-to-person SMS still needs 10DLC brand registration on the SignalWire number.
 
