@@ -9,7 +9,7 @@ export const site = {
   zip: "94541",
   phone: "(341) 250-3505",
   phoneTel: "+13412503505",
-  email: "hello@clearwayjunk.com",
+  email: "hello@info.clearwayjunkhaul.com",
   opsEmail: "ops@clearwayjunk.com",
   hours: "7:00 a.m. to 7:00 p.m., seven days a week",
   founded: 2014,

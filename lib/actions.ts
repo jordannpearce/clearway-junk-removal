@@ -245,7 +245,7 @@ export async function contactAction(formData: FormData) {
   const message = String(formData.get("message") || "");
   await notifyPeople({
     channel: "email",
-    to: "hello@clearwayjunk.com",
+    to: site.email,
     subject: `Website note from ${name}`,
     body: `${message}\n\nFrom ${name} <${email}> ${formData.get("phone") || ""}`,
   });
