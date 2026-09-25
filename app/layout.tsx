@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Newsreader, Outfit } from "next/font/google";
+import Script from "next/script";
 import { publicSiteUrl, site } from "@/lib/site";
 import "./globals.css";
 
@@ -35,6 +36,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${outfit.variable} ${newsreader.variable} h-full antialiased`}
     >
+      <head>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${site.gaMeasurementId}`}
+          strategy="beforeInteractive"
+        />
+        <Script id="google-analytics" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${site.gaMeasurementId}');
+          `}
+        </Script>
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
       </body>

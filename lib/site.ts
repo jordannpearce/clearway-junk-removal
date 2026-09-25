@@ -14,6 +14,7 @@ export const site = {
   hours: "7:00 a.m. to 7:00 p.m., seven days a week",
   founded: 2014,
   url: "https://clearwayjunkhaul.com",
+  gaMeasurementId: "G-J5687RP3JH",
   description:
     "Clearway Junk Removal is a Hayward, California junk hauling and debris removal company that helps homeowners, landlords, and job sites across Alameda County and Contra Costa County clear space with same-day crews, careful handling, and responsible recycling.",
 } as const;
